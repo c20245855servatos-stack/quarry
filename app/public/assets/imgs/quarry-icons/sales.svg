@@ -1,0 +1,20 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sales chart with quarry materials -->
+  <rect x="2" y="20" width="20" height="2" fill="#8B4513"/>
+  <rect x="2" y="2" width="2" height="20" fill="#8B4513"/>
+  
+  <!-- Bar chart representing material sales -->
+  <rect x="4" y="16" width="3" height="4" fill="#A9A9A9"/>
+  <rect x="8" y="12" width="3" height="8" fill="#D2691E"/>
+  <rect x="12" y="8" width="3" height="12" fill="#F4A460"/>
+  <rect x="16" y="14" width="3" height="6" fill="#DDA0DD"/>
+  
+  <!-- Material icons on bars -->
+  <circle cx="5.5" cy="18" r="0.5" fill="white"/>
+  <circle cx="9.5" cy="14" r="0.5" fill="white"/>
+  <circle cx="13.5" cy="10" r="0.5" fill="white"/>
+  <circle cx="17.5" cy="16" r="0.5" fill="white"/>
+  
+  <!-- Trend arrow -->
+  <path d="M18 6 L22 6 L20 4 M22 6 L20 8" stroke="#32CD32" stroke-width="2" fill="none"/>
+</svg>

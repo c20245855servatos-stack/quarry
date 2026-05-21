@@ -1,0 +1,16 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mining equipment gear -->
+  <circle cx="12" cy="12" r="8" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <circle cx="12" cy="12" r="4" fill="#A0522D"/>
+  <circle cx="12" cy="12" r="2" fill="#654321"/>
+  <!-- Gear teeth -->
+  <rect x="11" y="2" width="2" height="4" fill="#8B4513"/>
+  <rect x="11" y="18" width="2" height="4" fill="#8B4513"/>
+  <rect x="2" y="11" width="4" height="2" fill="#8B4513"/>
+  <rect x="18" y="11" width="4" height="2" fill="#8B4513"/>
+  <!-- Diagonal teeth -->
+  <rect x="5.5" y="5.5" width="3" height="1.5" fill="#8B4513" transform="rotate(45 7 6.25)"/>
+  <rect x="15.5" y="5.5" width="3" height="1.5" fill="#8B4513" transform="rotate(-45 17 6.25)"/>
+  <rect x="5.5" y="17" width="3" height="1.5" fill="#8B4513" transform="rotate(-45 7 17.75)"/>
+  <rect x="15.5" y="17" width="3" height="1.5" fill="#8B4513" transform="rotate(45 17 17.75)"/>
+</svg>

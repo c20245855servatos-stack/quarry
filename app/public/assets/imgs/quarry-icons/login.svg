@@ -1,0 +1,16 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Quarry entrance gate -->
+  <rect x="2" y="12" width="20" height="8" fill="#8B4513"/>
+  <rect x="4" y="6" width="2" height="6" fill="#654321"/>
+  <rect x="18" y="6" width="2" height="6" fill="#654321"/>
+  
+  <!-- Gate -->
+  <rect x="6" y="8" width="12" height="4" fill="#A0522D" stroke="#654321" stroke-width="1"/>
+  <rect x="10" y="9" width="4" height="2" fill="#87CEEB"/>
+  
+  <!-- Arrow pointing in -->
+  <path d="M14 10 L16 10 L15 9 M16 10 L15 11" stroke="#32CD32" stroke-width="2" fill="none"/>
+  
+  <!-- Quarry sign -->
+  <rect x="8" y="4" width="8" height="2" fill="#FFD700" stroke="#FFA500" stroke-width="1"/>
+</svg>

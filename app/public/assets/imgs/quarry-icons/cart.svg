@@ -1,0 +1,15 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mining cart with materials -->
+  <path d="M4 8 L6 6 L18 6 L20 8 L18 16 L6 16 Z" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <!-- Cart materials -->
+  <circle cx="8" cy="10" r="1.5" fill="#A9A9A9"/>
+  <circle cx="12" cy="10" r="1.5" fill="#D2691E"/>
+  <circle cx="16" cy="10" r="1.5" fill="#F4A460"/>
+  <circle cx="10" cy="12" r="1" fill="#A9A9A9"/>
+  <circle cx="14" cy="12" r="1" fill="#D2691E"/>
+  <!-- Wheels -->
+  <circle cx="8" cy="18" r="2" fill="#2F4F4F"/>
+  <circle cx="16" cy="18" r="2" fill="#2F4F4F"/>
+  <!-- Cart handle -->
+  <rect x="2" y="7" width="2" height="8" fill="#8B4513"/>
+</svg>

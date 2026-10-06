@@ -433,6 +433,45 @@ class Material
         return (float) ($val ?? 0);
     }
 
+    public function totalRevenueAllTime(): float
+    {
+        $val = $this->db->query("SELECT SUM(total_amount) FROM orders WHERE order_status='completed'")->fetchColumn();
+        return (float) ($val ?? 0);
+    }
+
+    public function totalRevenueByMonth(int $year, int $month): float
+    {
+        $stmt = $this->db->prepare("SELECT SUM(total_amount) FROM orders WHERE order_status='completed' AND YEAR(created_at) = ? AND MONTH(created_at) = ?");
+        $stmt->execute([$year, $month]);
+        return (float) ($stmt->fetchColumn() ?? 0);
+    }
+
+    public function completedOrdersByMonth(int $year, int $month): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT o.*, u.full_name, u.email
+            FROM orders o
+            LEFT JOIN users u ON o.client_id = u.client_id
+            WHERE o.order_status = 'completed'
+              AND YEAR(o.created_at) = ? AND MONTH(o.created_at) = ?
+            ORDER BY o.created_at DESC
+        ");
+        $stmt->execute([$year, $month]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+    }
+
+    public function availableRevenueMonths(): array
+    {
+        $stmt = $this->db->query("
+            SELECT DISTINCT DATE_FORMAT(created_at, '%Y-%m') as ym,
+                   YEAR(created_at) as yr, MONTH(created_at) as mo
+            FROM orders
+            WHERE order_status = 'completed'
+            ORDER BY ym DESC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
+    }
+
     public function recentOrders(int $limit = 5): array
     {
         $stmt = $this->db->prepare("
@@ -482,6 +521,7 @@ class Material
             SELECT o.order_id, o.delivery_date, o.order_status, o.total_amount, u.full_name
             FROM orders o
             LEFT JOIN users u ON o.client_id = u.client_id
+            WHERE o.order_status NOT IN ('pending', 'cancelled')
             ORDER BY o.delivery_date ASC
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?? [];
@@ -857,7 +897,7 @@ class Material
         }
     }
 
-    public function getLowStockMaterials(int $threshold = 10): array
+    public function getLowStockMaterials(int $threshold = 50): array
     {
         try {
             $stmt = $this->db->prepare("
@@ -927,14 +967,13 @@ class Material
             $stmt = $this->db->query("
                 SELECT 
                     COUNT(*) as total_materials,
-                    SUM(CASE WHEN stock_quantity > 10 THEN 1 ELSE 0 END) as well_stocked,
-                    SUM(CASE WHEN stock_quantity > 0 AND stock_quantity <= 10 THEN 1 ELSE 0 END) as low_stock,
-                    SUM(CASE WHEN stock_quantity <= 0 THEN 1 ELSE 0 END) as out_of_stock,
-                    SUM(stock_quantity) as total_stock_units
-                FROM materials 
-                WHERE is_active = 1
+                    SUM(CASE WHEN is_active = 1 AND stock_quantity > 50 THEN 1 ELSE 0 END) as well_stocked,
+                    SUM(CASE WHEN is_active = 1 AND stock_quantity > 0 AND stock_quantity <= 50 THEN 1 ELSE 0 END) as low_stock,
+                    SUM(CASE WHEN is_active = 1 AND stock_quantity <= 0 THEN 1 ELSE 0 END) as out_of_stock,
+                    SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive,
+                    SUM(CASE WHEN is_active = 1 THEN stock_quantity ELSE 0 END) as total_stock_units
+                FROM materials
             ");
-            
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
         } catch (Exception $e) {
             error_log("GET STOCK SUMMARY ERROR: " . $e->getMessage());

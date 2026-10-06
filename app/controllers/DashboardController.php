@@ -56,17 +56,27 @@ class DashboardController
         }
 
         $materialModel = new Material();
-        // Load orders from database instead of session
         $allOrders = $materialModel->allOrders();
-        $orders = array_filter($allOrders, fn($o) => $o['client_id'] == ($user['id'] ?? 0));
-        
-        // Sort orders by date - newest first (descending order)
-        usort($orders, function($a, $b) {
-            $dateA = strtotime($a['order_date'] ?? '0');
-            $dateB = strtotime($b['order_date'] ?? '0');
-            return $dateB - $dateA; // Descending order (newest first)
+        $myOrders  = array_filter($allOrders, fn($o) => $o['client_id'] == ($user['id'] ?? 0));
+
+        // Sort newest first
+        usort($myOrders, function($a, $b) {
+            return strtotime($b['order_date'] ?? '0') - strtotime($a['order_date'] ?? '0');
         });
-        
+
+        // Status filter from URL
+        $filterStatus = strtolower(trim($_GET['status'] ?? 'all'));
+        $allowedStatuses = ['all','pending','confirmed','processing','out_for_delivery','completed','cancelled'];
+        if (!in_array($filterStatus, $allowedStatuses)) $filterStatus = 'all';
+
+        if ($filterStatus !== 'all') {
+            $orders = array_filter($myOrders, fn($o) => strtolower($o['order_status'] ?? '') === $filterStatus);
+        } else {
+            $orders = $myOrders;
+        }
+
+        $orders = array_values($orders);
+
         require __DIR__ . '/../views/dashboard/myOrder.php';
     }
 

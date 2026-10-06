@@ -236,78 +236,119 @@
 }
 
 .badge-pending {
-    background: rgba(255, 193, 7, 0.25);
-    color: #d97706;
-    border: 2px solid rgba(255, 193, 7, 0.5);
-    padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 900;
+    background: rgba(245,158,11,0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245,158,11,0.4);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .badge-confirmed {
-    background: rgba(59, 130, 246, 0.25);
-    color: #2563eb;
-    border: 2px solid rgba(59, 130, 246, 0.5);
-    padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 900;
+    background: rgba(59,130,246,0.15);
+    color: #3b82f6;
+    border: 1px solid rgba(59,130,246,0.4);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .badge-processing {
-    background: rgba(168, 85, 247, 0.25);
-    color: #7c3aed;
-    border: 2px solid rgba(168, 85, 247, 0.5);
-    padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 900;
+    background: rgba(139,92,246,0.15);
+    color: #8b5cf6;
+    border: 1px solid rgba(139,92,246,0.4);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+}
+
+.badge-out_for_delivery {
+    background: rgba(6,182,212,0.15);
+    color: #06b6d4;
+    border: 1px solid rgba(6,182,212,0.4);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .badge-completed {
-    background: rgba(34, 197, 94, 0.25);
-    color: #059669;
-    border: 2px solid rgba(34, 197, 94, 0.5);
-    padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 900;
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34,197,94,0.4);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .badge-cancelled {
-    background: rgba(239, 68, 68, 0.25);
-    color: #dc2626;
-    border: 2px solid rgba(239, 68, 68, 0.5);
-    padding: 4px 12px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 900;
+    background: rgba(239,68,68,0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239,68,68,0.4);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+}
+
+.btn-cancel-order {
+    background: #dc2626;
+    border: none;
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(220,38,38,0.3);
+}
+.btn-cancel-order:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(220,38,38,0.45);
+}
+.btn-cancel-order:active {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 .page-header {
@@ -493,7 +534,10 @@
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
                 <h2><i class="bi bi-box-seam me-2"></i>My Orders</h2>
-                <p><?= count($orders) ?> order<?= count($orders) !== 1 ? 's' : '' ?> total</p>
+                <p>
+                    <?= count($orders) ?> order<?= count($orders) !== 1 ? 's' : '' ?>
+                    <?= $filterStatus !== 'all' ? '— <strong>' . ucfirst(str_replace('_', ' ', $filterStatus)) . '</strong>' : 'total' ?>
+                </p>
             </div>
             <a href="?controller=dashboard&action=shop" class="btn btn-light fw-bold px-4">
                 <i class="bi bi-shop me-1"></i> Continue Shopping
@@ -509,6 +553,79 @@
             <a href="?controller=dashboard&action=shop" class="btn btn-warning fw-bold px-4">Browse Materials</a>
         </div>
     <?php else: ?>
+
+        <!-- STATUS FILTER PILLS -->
+        <?php
+        $allMyOrders = array_values(array_filter($materialModel->allOrders(), fn($o) => $o['client_id'] == ($user['id'] ?? 0)));
+        $statusCounts = ['all' => count($allMyOrders)];
+        foreach ($allMyOrders as $o) {
+            $s = strtolower($o['order_status'] ?? 'pending');
+            $statusCounts[$s] = ($statusCounts[$s] ?? 0) + 1;
+        }
+        $filterLabels = [
+            'all'              => ['label' => 'All',              'icon' => 'bi-grid-fill'],
+            'pending'          => ['label' => 'Pending',          'icon' => 'bi-clock-fill'],
+            'confirmed'        => ['label' => 'Confirmed',        'icon' => 'bi-check-circle'],
+            'processing'       => ['label' => 'Processing',       'icon' => 'bi-gear-fill'],
+            'out_for_delivery' => ['label' => 'Out for Delivery', 'icon' => 'bi-truck'],
+            'completed'        => ['label' => 'Completed',        'icon' => 'bi-check-circle-fill'],
+            'cancelled'        => ['label' => 'Cancelled',        'icon' => 'bi-x-circle-fill'],
+        ];
+        ?>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;">
+            <?php foreach ($filterLabels as $key => $f):
+                if ($key !== 'all' && empty($statusCounts[$key])) continue;
+                $count = $statusCounts[$key] ?? 0;
+                $isActive = $filterStatus === $key;
+                $url = '?controller=dashboard&action=orders&status=' . $key;
+            ?>
+            <a href="<?= $url ?>" class="order-filter-pill <?= $isActive ? 'active' : '' ?>">
+                <i class="bi <?= $f['icon'] ?> me-1"></i>
+                <?= $f['label'] ?>
+                <span class="pill-count"><?= $count ?></span>
+            </a>
+            <?php endforeach; ?>
+        </div>
+
+        <style>
+        .order-filter-pill {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.75);
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+        .order-filter-pill:hover {
+            background: rgba(255,215,0,0.15);
+            border-color: #FFD700;
+            color: #FFD700;
+            text-decoration: none;
+        }
+        .order-filter-pill.active {
+            background: #FFD700;
+            border-color: #FFD700;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+        .pill-count {
+            background: rgba(0,0,0,0.15);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 900;
+        }
+        .order-filter-pill.active .pill-count {
+            background: rgba(0,0,0,0.2);
+        }
+        </style>
         <?php 
         // Pagination setup
         $ordersPerPage = 5;
@@ -521,8 +638,10 @@
         $paginatedOrders = array_slice($orders, $startIndex, $ordersPerPage);
         ?>
         
-        <?php foreach ($paginatedOrders as $order): ?>
-        <div class="order-card">
+        <?php
+        $materialModel = new Material();
+        foreach ($paginatedOrders as $order): ?>
+        <div class="order-card" data-status="<?= strtolower($order['order_status'] ?? 'pending') ?>">
             <div class="order-header">
                 <div class="order-id-section">
                     <div class="order-icon">
@@ -562,18 +681,20 @@
                 <?php
                 $status = strtolower($order['order_status'] ?? 'pending');
                 $badgeClass = match($status) {
-                    'completed' => 'badge-completed',
-                    'cancelled' => 'badge-cancelled',
-                    'confirmed' => 'badge-confirmed',
-                    'processing' => 'badge-processing',
-                    default     => 'badge-pending',
+                    'completed'        => 'badge-completed',
+                    'cancelled'        => 'badge-cancelled',
+                    'confirmed'        => 'badge-confirmed',
+                    'processing'       => 'badge-processing',
+                    'out_for_delivery' => 'badge-out_for_delivery',
+                    default            => 'badge-pending',
                 };
                 $statusIcon = match($status) {
-                    'completed' => 'check-circle-fill',
-                    'cancelled' => 'x-circle-fill',
-                    'confirmed' => 'check-circle',
-                    'processing' => 'arrow-repeat',
-                    default     => 'clock-fill',
+                    'completed'        => 'check-circle-fill',
+                    'cancelled'        => 'x-circle-fill',
+                    'confirmed'        => 'check-circle',
+                    'processing'       => 'arrow-repeat',
+                    'out_for_delivery' => 'truck',
+                    default            => 'clock-fill',
                 };
                 // Cancellable statuses — cannot cancel if out_for_delivery, completed, or already cancelled
                 $cancellable = $status === 'pending';
@@ -584,13 +705,8 @@
                         <?= ucfirst(str_replace('_', ' ', $order['order_status'] ?? 'Pending')) ?>
                     </span>
                     <?php if ($cancellable): ?>
-                    <button onclick="openCancelModal(<?= $order['order_id'] ?>)"
-                        style="background:rgba(239,68,68,0.1); border:2px solid rgba(239,68,68,0.4); color:#dc2626;
-                               padding:6px 14px; border-radius:8px; font-size:0.8rem; font-weight:800;
-                               cursor:pointer; transition:0.2s ease; display:flex; align-items:center; gap:6px;"
-                        onmouseover="this.style.background='rgba(239,68,68,0.2)'"
-                        onmouseout="this.style.background='rgba(239,68,68,0.1)'">
-                        <i class="bi bi-x-circle-fill"></i> Cancel Order
+                    <button onclick="openCancelModal(<?= $order['order_id'] ?>)" class="btn-cancel-order">
+                        <i class="bi bi-x-lg"></i> Cancel Order
                     </button>
                     <?php elseif ($status === 'out_for_delivery'): ?>
                     <span style="font-size:0.75rem; color:#f59e0b; font-weight:700;">
@@ -602,7 +718,6 @@
 
             <ul class="order-items">
                 <?php 
-                $materialModel = new Material();
                 $orderItems = $materialModel->orderItems($order['order_id']);
                 $calculatedSubtotal = 0;
                 foreach ($orderItems as $item): 
@@ -626,26 +741,26 @@
 
             <div class="order-footer">
                 <?php 
-                // Calculate VAT and total
-                $vat = $calculatedSubtotal * 0.12;
-                $totalWithVat = $calculatedSubtotal + $vat;
+                // Calculate delivery fee and total
+                $delivery_fee = 500.00;
+                $totalWithFee = $calculatedSubtotal + $delivery_fee;
                 ?>
                 
                 <?php if ($calculatedSubtotal > 0): ?>
-                <!-- Subtotal and VAT Breakdown -->
+                <!-- Subtotal and Delivery Fee Breakdown -->
                 <div style="width: 100%; margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; color: #2d2d2d; font-weight: 700;">
                         <span>Subtotal:</span>
                         <span>₱<?= number_format($calculatedSubtotal, 2) ?></span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; color: #2d2d2d; font-weight: 700;">
-                        <span>VAT (12%):</span>
-                        <span>₱<?= number_format($vat, 2) ?></span>
+                        <span>Delivery Fee:</span>
+                        <span>₱<?= number_format($delivery_fee, 2) ?></span>
                     </div>
                     <div style="border-top: 2px solid rgba(52, 101, 109, 0.2); padding-top: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div class="order-total">Total Amount:</div>
-                            <div class="order-total-amount">₱<?= number_format($totalWithVat, 2) ?></div>
+                            <div class="order-total-amount">₱<?= number_format($totalWithFee, 2) ?></div>
                         </div>
                     </div>
                 </div>
@@ -692,7 +807,7 @@
                         </div>
                         <div style="background:rgba(255,255,255,0.6); border-radius:6px; padding:6px 10px;">
                             <div style="color:#6b7280; font-weight:700; margin-bottom:1px;">Total Paid</div>
-                            <div style="font-weight:900; color:#15803d;">₱<?= number_format($totalWithVat ?: (float)($order['total_amount'] ?? 0), 2) ?></div>
+                            <div style="font-weight:900; color:#15803d;">₱<?= number_format($totalWithFee ?: (float)($order['total_amount'] ?? 0), 2) ?></div>
                         </div>
                     </div>
                     <?php if (!empty($order['arrival_date'])): ?>
@@ -772,178 +887,61 @@
 </div>
 
 <!-- Delivery Confirmation Modal -->
-<div class="confirmation-modal-overlay" id="confirmationModal">
-    <div class="confirmation-modal">
-        <div class="confirmation-modal-header">
-            <h4><i class="bi bi-check-circle me-2" style="color: #16a34a;"></i>Confirm Delivery</h4>
-            <button class="confirmation-modal-close" onclick="closeConfirmationModal()">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        <div class="confirmation-modal-body">
-            <p>Have you received all the materials for this order?</p>
-            <p><small style="color: #666;">This action will mark the order as delivered and completed.</small></p>
-        </div>
-        <div class="confirmation-modal-footer">
-            <button class="btn-cancel" onclick="closeConfirmationModal()">Cancel</button>
-            <button class="btn-confirm" onclick="submitDeliveryConfirmation()">
-                <i class="bi bi-check-circle me-2"></i>Yes, Confirm Delivery
-            </button>
-        </div>
+<div class="sys-modal-overlay" id="confirmationModal">
+  <div class="sys-modal">
+    <div class="sys-modal-icon green"><i class="bi bi-truck"></i></div>
+    <div class="sys-modal-title">Confirm Delivery</div>
+    <div class="sys-modal-msg">Have you received all the materials for this order?<br><span style="font-size:0.8rem;">This will mark the order as delivered and completed.</span></div>
+    <div class="sys-modal-btns">
+      <button class="sys-btn-cancel" onclick="closeConfirmationModal()">Cancel</button>
+      <button class="sys-btn-green" onclick="submitDeliveryConfirmation()">
+        <i class="bi bi-check-circle-fill"></i> Confirm Delivery
+      </button>
     </div>
+  </div>
 </div>
 
-<style>
-.confirmation-modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.3s ease;
-}
-
-.confirmation-modal-overlay.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.confirmation-modal {
-    background: white;
-    border-radius: 16px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    transform: translateY(20px);
-    transition: 0.3s ease;
-}
-
-.confirmation-modal-overlay.show .confirmation-modal {
-    transform: translateY(0);
-}
-
-.confirmation-modal-header {
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.confirmation-modal-header h4 {
-    margin: 0;
-    font-weight: 800;
-    color: #1a1a1a;
-    display: flex;
-    align-items: center;
-}
-
-.confirmation-modal-close {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: #666;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: 0.2s ease;
-}
-
-.confirmation-modal-close:hover {
-    background: #f5f5f5;
-    color: #333;
-}
-
-.confirmation-modal-body {
-    padding: 20px 24px;
-}
-
-.confirmation-modal-body p {
-    margin: 0 0 12px;
-    color: #333;
-    font-weight: 600;
-}
-
-.confirmation-modal-footer {
-    padding: 16px 24px 20px;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-}
-
-.btn-cancel {
-    background: #f5f5f5;
-    color: #666;
-    border: 2px solid #e5e5e5;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.btn-cancel:hover {
-    background: #e5e5e5;
-    color: #333;
-}
-
-.btn-confirm {
-    background: linear-gradient(135deg, #16a34a, #15803d);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s ease;
-    display: flex;
-    align-items: center;
-}
-
-.btn-confirm:hover {
-    background: linear-gradient(135deg, #15803d, #166534);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-}
-</style>
+<!-- Cancel Order Modal -->
+<div class="sys-modal-overlay" id="cancelModal">
+  <div class="sys-modal">
+    <div class="sys-modal-icon red"><i class="bi bi-x-circle-fill"></i></div>
+    <div class="sys-modal-title">Cancel Order</div>
+    <div class="sys-modal-msg">Are you sure you want to cancel this order?<br><span style="font-size:0.8rem;">This action cannot be undone. Stock will be restored.</span></div>
+    <div class="sys-modal-btns">
+      <button class="sys-btn-cancel" onclick="closeCancelModal()">Keep Order</button>
+      <button class="sys-btn-red" onclick="submitCancelOrder()">
+        <i class="bi bi-x-circle-fill"></i> Cancel Order
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 let currentOrderId = null;
 
 function confirmDelivery(orderId) {
     currentOrderId = orderId;
-    document.getElementById('confirmationModal').classList.add('show');
+    document.getElementById('confirmationModal').classList.add('open');
 }
 
 function closeConfirmationModal() {
-    document.getElementById('confirmationModal').classList.remove('show');
+    document.getElementById('confirmationModal').classList.remove('open');
     currentOrderId = null;
 }
 
 function submitDeliveryConfirmation() {
     if (currentOrderId) {
-        // Create a form and submit it
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '?controller=dashboard&action=confirmDelivery';
-        
         const orderIdInput = document.createElement('input');
         orderIdInput.type = 'hidden';
         orderIdInput.name = 'order_id';
         orderIdInput.value = currentOrderId;
-
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
         csrfInput.name = '_csrf';
         csrfInput.value = '<?= Csrf::generate() ?>';
-        
         form.appendChild(orderIdInput);
         form.appendChild(csrfInput);
         document.body.appendChild(form);
@@ -951,23 +949,15 @@ function submitDeliveryConfirmation() {
     }
 }
 
-// Close modal when clicking outside
-document.getElementById('confirmationModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeConfirmationModal();
-    }
-});
-
-// Cancel order
 let cancelOrderId = null;
 
 function openCancelModal(orderId) {
     cancelOrderId = orderId;
-    document.getElementById('cancelModal').classList.add('show');
+    document.getElementById('cancelModal').classList.add('open');
 }
 
 function closeCancelModal() {
-    document.getElementById('cancelModal').classList.remove('show');
+    document.getElementById('cancelModal').classList.remove('open');
     cancelOrderId = null;
 }
 
@@ -991,35 +981,22 @@ function submitCancelOrder() {
     }
 }
 
+document.getElementById('confirmationModal').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirmationModal();
+});
+
+function filterOrders(filter, btn) {}
 document.getElementById('cancelModal').addEventListener('click', function(e) {
     if (e.target === this) closeCancelModal();
 });
-</script>
 
-<!-- Cancel Order Modal -->
-<div class="confirmation-modal-overlay" id="cancelModal">
-    <div class="confirmation-modal">
-        <div class="confirmation-modal-header">
-            <h4><i class="bi bi-x-circle-fill me-2" style="color:#dc2626;"></i>Cancel Order</h4>
-            <button class="confirmation-modal-close" onclick="closeCancelModal()">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        </div>
-        <div class="confirmation-modal-body">
-            <p>Are you sure you want to cancel this order?</p>
-            <p><small style="color:#666;">This action cannot be undone. Stock will be restored.</small></p>
-        </div>
-        <div class="confirmation-modal-footer">
-            <button class="btn-cancel" onclick="closeCancelModal()">Keep Order</button>
-            <button onclick="submitCancelOrder()"
-                style="background:linear-gradient(135deg,#dc2626,#b91c1c); color:white; border:none;
-                       padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer;
-                       transition:0.3s ease; display:flex; align-items:center; gap:6px;">
-                <i class="bi bi-x-circle-fill"></i> Yes, Cancel Order
-            </button>
-        </div>
-    </div>
-</div>
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeConfirmationModal();
+        closeCancelModal();
+    }
+});
+</script>
 
 <?php
 $content = ob_get_clean();

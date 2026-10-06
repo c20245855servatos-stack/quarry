@@ -39,222 +39,185 @@ $user = $_SESSION['user'] ?? null;
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(202, 170, 152, 0.7); }
-    50% { box-shadow: 0 0 0 10px rgba(202, 170, 152, 0); }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-}
-
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
 .dash-hero {
-    padding: 40px 36px;
-    border-radius: 20px;
-    background: var(--accent);
-    border: 2px solid var(--primary);
-    margin-bottom: 32px;
-    box-shadow: var(--shadow-lg);
-    animation: slideInUp 0.6s ease;
+    padding: 20px 8px 16px;
+    margin-bottom: 24px;
+    animation: slideInUp 0.5s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
     position: relative;
-    overflow: hidden;
-    transition: 0.3s ease;
+    text-align: center;
 }
 
-.dash-hero:hover {
-    border-color: var(--primary);
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-4px);
+.dash-hero::before { display: none; }
+
+.dash-hero-welcome {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 8px;
 }
 
-.dash-hero::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 300px;
-    height: 300px;
-    background: rgba(26, 26, 26, 0.1);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
+.dash-hero-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.dash-hero-logo {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
 }
 
 .dash-hero h1 { 
-    font-size: 2.2rem; 
+    font-size: 3.8rem; 
     font-weight: 900; 
-    margin: 0 0 8px; 
-    color: var(--primary);
-    position: relative;
-    z-index: 1;
-}
-
-.dash-hero p  { 
-    color: var(--primary); 
     margin: 0; 
-    font-size: 1rem;
-    position: relative;
-    z-index: 1;
-    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    line-height: 1;
 }
 
+.dash-hero-sub {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+}
+
+.dash-hero p { display: none; }
+
+/* ── STAT CARDS ── */
 .glass-card {
-    background: var(--surface);
-    border-radius: 18px;
-    border: 3px solid var(--accent);
-    padding: 28px 22px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.09);
+    padding: 24px 20px;
     text-align: center;
-    transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: 0.2s ease;
     position: relative;
     overflow: hidden;
-    animation: slideInUp 0.6s ease both;
-    box-shadow: var(--shadow-sm);
+    animation: slideInUp 0.5s ease both;
+    cursor: pointer;
 }
 
-.glass-card:nth-child(1) { animation-delay: 0.1s; }
-.glass-card:nth-child(2) { animation-delay: 0.2s; }
-.glass-card:nth-child(3) { animation-delay: 0.3s; }
-.glass-card:nth-child(4) { animation-delay: 0.4s; }
-
-.glass-card::before {
+.glass-card::after {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--primary);
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: #FFD700;
+    border-radius: 12px 12px 0 0;
     opacity: 0;
-    transition: 0.3s;
+    transition: 0.2s ease;
 }
 
-.glass-card:hover { 
-    background: var(--surface-alt);
-    transform: translateY(-12px) scale(1.03);
-    border-color: var(--accent);
-    box-shadow: var(--shadow-md);
+.glass-card:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,215,0,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
-.glass-card:hover::before { opacity: 1; }
+.glass-card:hover::after { opacity: 1; }
 
-.stat-card-link {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-    outline: none;
-    display: block;
-}
+.glass-card::before { content: none; }
 
-.stat-card-link:focus,
-.stat-card-link:focus-visible {
-    outline: none;
-    box-shadow: none;
-}
-
-.glass-card:active {
-    transform: translateY(-4px) scale(0.98);
-    background: var(--accent);
-    border-color: var(--primary);
-    box-shadow: var(--shadow-sm);
-}
-
-.glass-card:active h3 {
-    color: var(--primary);
-    transform: scale(1.05);
-}
-
-.glass-card:active p {
-    color: var(--primary);
-}
+.glass-card:nth-child(1) { animation-delay: 0.05s; }
+.glass-card:nth-child(2) { animation-delay: 0.1s; }
+.glass-card:nth-child(3) { animation-delay: 0.15s; }
+.glass-card:nth-child(4) { animation-delay: 0.2s; }
 
 .glass-card h3 { 
-    font-size: 2.8rem; 
+    font-size: 2.4rem; 
     font-weight: 900; 
-    color: var(--text-primary); 
+    color: #ffffff; 
     margin: 0 0 6px;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
+    line-height: 1;
+    letter-spacing: -1px;
 }
 
-.glass-card h3::before {
-    content: none;
-}
-
-.glass-card:hover h3 {
-    transform: scale(1.15);
-}
-
-.glass-card:hover h3::before {
-    opacity: 0;
-}
-
-.glass-card p  { 
-    color: var(--text-secondary); 
-    font-size: 0.85rem; 
+.glass-card p { 
+    color: rgba(255,255,255,0.4); 
+    font-size: 0.7rem; 
     text-transform: uppercase; 
-    letter-spacing: 1px; 
+    letter-spacing: 1.5px; 
     margin: 0;
-    font-weight: 800;
-}
-
-.section-title {
-    font-size: 1.4rem;
-    font-weight: 900;
-    margin-bottom: 20px;
-    color: var(--text-light);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: slideInUp 0.6s ease;
-}
-
-.empty-state {
-    background: var(--surface);
-    border: 2px dashed var(--accent);
-    border-radius: 16px;
-    padding: 48px;
-    text-align: center;
-    color: var(--text-primary);
     font-weight: 700;
 }
 
-.empty-state i {
-    font-size: 3rem;
+.stat-card-link {
+    text-decoration: none;
     display: block;
-    margin-bottom: 16px;
-    color: var(--text-secondary);
+    height: 100%;
+}
+
+/* ── QUICK ACTIONS ── */
+.dash-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.2s ease;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.05);
+}
+
+.dash-action-btn:hover {
+    background: rgba(255,215,0,0.12);
+    border-color: rgba(255,215,0,0.4);
+    color: #FFD700;
+    text-decoration: none;
+}
+
+/* ── ORDER HISTORY ── */
+.section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 14px;
+    animation: slideInUp 0.5s ease;
 }
 
 .history-card {
-    background: var(--surface);
-    border: 3px solid var(--accent);
-    border-radius: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
     overflow: hidden;
-    animation: slideInUp 0.6s ease;
-    transition: 0.3s ease;
-    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.15);
-}
-
-.history-card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 12px 40px rgba(255, 215, 0, 0.25);
+    animation: slideInUp 0.5s ease;
 }
 
 .history-header {
-    background: var(--accent);
-    padding: 16px 20px;
-    border-bottom: 2px solid var(--primary);
+    background: rgba(255,255,255,0.04);
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -262,63 +225,46 @@ $user = $_SESSION['user'] ?? null;
 
 .history-header h6 {
     margin: 0;
-    font-size: 0.85rem;
-    font-weight: 900;
-    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
 }
 
 .history-item {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--accent);
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: 0.2s ease;
+    transition: 0.15s ease;
     animation: fadeIn 0.4s ease both;
 }
 
-.history-item:nth-child(1) { animation-delay: 0.1s; }
-.history-item:nth-child(2) { animation-delay: 0.15s; }
-.history-item:nth-child(3) { animation-delay: 0.2s; }
-.history-item:nth-child(4) { animation-delay: 0.25s; }
-.history-item:nth-child(5) { animation-delay: 0.3s; }
-
-.history-item:last-child {
-    border-bottom: none;
-}
-
-.history-item:hover {
-    background: rgba(255, 215, 0, 0.1);
-}
+.history-item:last-child { border-bottom: none; }
+.history-item:hover { background: rgba(255,255,255,0.03); }
 
 .history-item-left {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .history-item-name {
-    font-weight: 900;
-    color: var(--text-primary);
-    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 0.9rem;
 }
 
 .history-item-meta {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-weight: 700;
-}
-
-.history-item-meta span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    gap: 10px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.35);
+    font-weight: 600;
 }
 
 .history-item-right {
@@ -329,138 +275,155 @@ $user = $_SESSION['user'] ?? null;
 }
 
 .history-item-price {
-    font-size: 1.1rem;
-    font-weight: 900;
-    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
 }
 
 .history-item-qty {
-    background: var(--accent);
-    border: 1px solid var(--primary);
-    color: var(--primary);
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.2);
+    color: #FFD700;
     padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 800;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
 }
 
 .history-footer {
-    background: var(--accent);
+    background: rgba(255,255,255,0.03);
     padding: 12px 20px;
     text-align: center;
-    color: var(--primary);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    border-top: 1px solid var(--primary);
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.history-footer a {
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.history-footer a:hover { color: #FFD700; }
+
+.empty-state {
+    background: rgba(255,255,255,0.03);
+    border: 1px dashed rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 48px;
+    text-align: center;
+    color: rgba(255,255,255,0.4);
+    font-weight: 600;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.3;
 }
 
 @media (max-width: 768px) {
-    .history-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .history-item-right {
-        width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .history-item-meta {
-        flex-wrap: wrap;
-    }
-
-    .dash-hero {
-        padding: 28px 20px;
-    }
-
-    .dash-hero h1 {
-        font-size: 1.6rem;
-    }
+    .history-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .history-item-right { width: 100%; flex-direction: row; justify-content: space-between; }
+    .dash-hero { padding: 24px 8px 20px; }
+    .dash-hero h1 { font-size: 2.2rem; letter-spacing: 2px; }
+    .dash-hero-logo { width: 52px; height: 52px; }
 }
 
-/* Stat cards: 2 columns on tablet, 1 on small mobile */
 @media (max-width: 991px) {
-    .row .col-3 {
-        flex: 0 0 auto;
-        width: 50%;
-    }
+    .row .col-3 { flex: 0 0 auto; width: 50%; }
 }
 
 @media (max-width: 575px) {
-    .row .col-3 {
-        flex: 0 0 auto;
-        width: 100%;
-        margin-bottom: 12px;
-    }
-
-    .dash-hero {
-        padding: 20px 16px;
-    }
-
-    .dash-hero h1 {
-        font-size: 1.4rem;
-    }
+    .row .col-3 { flex: 0 0 auto; width: 100%; margin-bottom: 12px; }
 }
 
-/* Ensure stats cards stay in one line on larger screens */
 @media (min-width: 992px) {
-    .row .col-3 {
-        flex: 0 0 auto;
-        width: 25%;
-    }
+    .row .col-3 { flex: 0 0 auto; width: 25%; }
 }
 </style>
 
 <div class="container-fluid p-4">
 
-    <!-- HERO -->
-    <div class="dash-hero">
-        <h1>Welcome back, <?= htmlspecialchars($user['name'] ?? 'Guest') ?> <i class="bi bi-hand-wave-fill"></i></h1>
-        <p>Your premium sand, stone & gravel supply dashboard</p>
+    <!-- FEATURED BANNER -->
+    <div id="dashCarousel" class="carousel slide mb-4" data-bs-ride="carousel" style="border-radius:16px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,0.6); border:2px solid rgba(255,215,0,0.3);">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#dashCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#dashCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#dashCarousel" data-bs-slide-to="2"></button>
+            <button type="button" data-bs-target="#dashCarousel" data-bs-slide-to="3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://images.pexels.com/photos/1029604/pexels-photo-1029604.jpeg?auto=compress&cs=tinysrgb&w=1400" class="d-block w-100" alt="Crushed Stone" style="height:240px; object-fit:cover; filter:brightness(0.5);">
+                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
+                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Premium Crushed Stone</h5>
+                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">High-quality aggregates for construction</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="https://images.pexels.com/photos/13838908/pexels-photo-13838908.png?auto=compress&cs=tinysrgb&w=1400" class="d-block w-100" alt="Gravel" style="height:240px; object-fit:cover; filter:brightness(0.5);">
+                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
+                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Construction Gravel</h5>
+                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">Ideal for drainage and road base</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="https://images.pexels.com/photos/27523355/pexels-photo-27523355.jpeg?auto=compress&cs=tinysrgb&w=1400" class="d-block w-100" alt="Fine Sand" style="height:240px; object-fit:cover; filter:brightness(0.5);">
+                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
+                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Fine Sand</h5>
+                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">Perfect for concrete and plastering</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="https://images.pexels.com/photos/31925745/pexels-photo-31925745.jpeg?auto=compress&cs=tinysrgb&w=1400" class="d-block w-100" alt="Quarry Materials" style="height:240px; object-fit:cover; filter:brightness(0.5);">
+                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
+                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Quarry Materials</h5>
+                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">Direct from quarry to your site</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#dashCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#dashCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
     </div>
 
     <!-- STATS -->
     <div class="row mb-4">
         <div class="col-3 mb-3">
-            <a href="?controller=dashboard&action=orders" class="stat-card-link" style="text-decoration:none;display:block;height:100%;">
-                <div class="glass-card" style="cursor:pointer;">
+            <a href="?controller=dashboard&action=orders" class="stat-card-link">
+                <div class="glass-card">
                     <h3><?= count($myOrders ?? []) ?></h3>
                     <p>Total Orders</p>
                 </div>
             </a>
         </div>
         <div class="col-3 mb-3">
-            <a href="?controller=dashboard&action=orders" class="stat-card-link" style="text-decoration:none;display:block;height:100%;">
-                <div class="glass-card" style="cursor:pointer;">
+            <a href="?controller=dashboard&action=orders&status=pending" class="stat-card-link">
+                <div class="glass-card">
                     <h3><?= $pendingCount ?? 0 ?></h3>
                     <p>Pending Orders</p>
                 </div>
             </a>
         </div>
         <div class="col-3 mb-3">
-            <a href="?controller=dashboard&action=orders" class="stat-card-link" style="text-decoration:none;display:block;height:100%;">
-                <div class="glass-card" style="cursor:pointer;">
+            <a href="?controller=dashboard&action=orders&status=completed" class="stat-card-link">
+                <div class="glass-card">
                     <h3><?= $completedCount ?? 0 ?></h3>
                     <p>Completed Orders</p>
                 </div>
             </a>
         </div>
         <div class="col-3 mb-3">
-            <a href="?controller=cart&action=index" class="stat-card-link" style="text-decoration:none;display:block;height:100%;">
-                <div class="glass-card" style="height:100%;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(135deg,rgba(255,193,7,0.2),rgba(255,193,7,0.1));border-color:rgba(255,193,7,0.3);cursor:pointer;">
-                    <h3 style="color:#ffc107;margin:0 0 4px;">
-                        <i class="bi bi-cart3"></i> 
+            <a href="?controller=cart&action=index" class="stat-card-link">
+                <div class="glass-card">
+                    <h3 style="color:#FFD700;">
                         <?php 
                         $cartCount = 0;
                         if (!empty($user['id'])) {
-                            try {
-                                $cartCount = $materialModel->getCartCount((int)$user['id']);
-                            } catch (Exception $e) {
-                                $cartCount = count($_SESSION['cart'] ?? []);
-                            }
+                            try { $cartCount = $materialModel->getCartCount((int)$user['id']); }
+                            catch (Exception $e) { $cartCount = count($_SESSION['cart'] ?? []); }
                         } else {
                             $cartCount = count($_SESSION['cart'] ?? []);
                         }
@@ -474,15 +437,15 @@ $user = $_SESSION['user'] ?? null;
     </div>
 
     <!-- QUICK ACTIONS -->
-    <div class="d-flex gap-3 mb-4 flex-wrap">
-        <a href="?controller=materials&action=index" class="btn fw-bold px-4" style="background:#6b7280; border-color:#4b5563; color:#ffffff; transition:all 0.3s ease;" onmouseover="this.style.background='#4b5563'" onmouseout="this.style.background='#6b7280'">
-            <i class="bi bi-shop me-1"></i> Browse Shop
+    <div class="d-flex gap-2 mb-4 flex-wrap">
+        <a href="?controller=materials&action=index" class="dash-action-btn">
+            <i class="bi bi-shop"></i> Browse Shop
         </a>
-        <a href="?controller=cart&action=index" class="btn fw-bold px-4" style="background:transparent; border:2px solid #6b7280; color:#ffffff; transition:all 0.3s ease;" onmouseover="this.style.background='rgba(107,114,128,0.1)'; this.style.borderColor='#4b5563'" onmouseout="this.style.background='transparent'; this.style.borderColor='#6b7280'">
-            <i class="bi bi-cart3 me-1"></i> My Cart
+        <a href="?controller=cart&action=index" class="dash-action-btn">
+            <i class="bi bi-cart3"></i> My Cart
         </a>
-        <a href="?controller=dashboard&action=orders" class="btn fw-bold px-4" style="background:transparent; border:2px solid #6b7280; color:#ffffff; transition:all 0.3s ease;" onmouseover="this.style.background='rgba(107,114,128,0.1)'; this.style.borderColor='#4b5563'" onmouseout="this.style.background='transparent'; this.style.borderColor='#6b7280'">
-            <i class="bi bi-box-seam me-1"></i> My Orders
+        <a href="?controller=dashboard&action=orders" class="dash-action-btn">
+            <i class="bi bi-box-seam"></i> My Orders
         </a>
     </div>
 
@@ -491,37 +454,6 @@ $user = $_SESSION['user'] ?? null;
 </div>
 
 <script>
-// Clear click feedback on stat cards
-document.querySelectorAll('.stat-card-link').forEach(link => {
-    link.addEventListener('mousedown', function() {
-        const card = this.querySelector('.glass-card');
-        card.style.transition = 'all 0.1s ease';
-        card.style.transform = 'translateY(2px) scale(0.95)';
-        card.style.background = '#FFD700';
-        card.style.borderColor = '#1a1a1a';
-        const h3 = card.querySelector('h3');
-        const p = card.querySelector('p');
-        if (h3) { h3.style.color = '#1a1a1a'; h3.style.fontSize = '3.2rem'; }
-        if (p)  { p.style.color = '#1a1a1a'; }
-    });
-
-    link.addEventListener('mouseup', function() {
-        const card = this.querySelector('.glass-card');
-        card.style.transition = 'all 0.3s ease';
-        card.style.transform = '';
-        card.style.background = '';
-        card.style.borderColor = '';
-        const h3 = card.querySelector('h3');
-        const p = card.querySelector('p');
-        if (h3) { h3.style.color = ''; h3.style.fontSize = ''; }
-        if (p)  { p.style.color = ''; }
-    });
-
-    // Touch support
-    link.addEventListener('touchstart', function() {
-        this.dispatchEvent(new Event('mousedown'));
-    }, { passive: true });
-});
 </script>
 
 <?php

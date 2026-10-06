@@ -1,15 +1,5 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    
-    # Force HTTP in development (remove "Not Secure" warnings)
-    RewriteCond %{HTTPS} on
-    RewriteCond %{HTTP_HOST} ^mini-capstone\.test$ [NC]
-    RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
-    
-    # Standard routing
-    RewriteRule ^$ public/ [L]
-    RewriteRule (.*) public/$1 [L]
-</IfModule>
+# Routing is handled by the vhost DocumentRoot pointing to /public
+# No rewrites needed here
 
 # ========================
 # SECURITY: BLOCK DIRECT ACCESS TO SENSITIVE DIRECTORIES

@@ -96,7 +96,6 @@
 .stat-icon.blue { background: #3b82f6; }
 .stat-icon.yellow { background: #eab308; }
 .stat-icon.orange { background: #f97316; }
-.stat-icon.teal { background: #14b8a6; }
 
 .stat-num {
   font-size: clamp(1rem, 1.4vw, 1.3rem);
@@ -126,45 +125,7 @@
   letter-spacing: 1px;
 }
 
-/* Quick Actions */
-.quick-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 32px;
-}
-
-.qa-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  padding: 10px 14px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: clamp(0.75rem, 1.2vw, 0.85rem);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: 0.3s ease;
-  white-space: nowrap;
-  flex: 1 1 auto;
-  justify-content: center;
-}
-
-.qa-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-  transform: translateY(-2px);
-}
-
-.qa-btn.qa-yellow { border-color: #eab308; }
-.qa-btn.qa-blue { border-color: #3b82f6; }
-.qa-btn.qa-teal { border-color: #14b8a6; }
-.qa-btn.qa-gray { border-color: #6b7280; }
-.qa-btn.qa-red { border-color: #ef4444; }
-.qa-btn.qa-orange { border-color: #f97316; }
-.qa-btn.qa-purple { border-color: #a855f7; }
+/* Quick Actions — removed (unused) */
 
 /* Grid Layout */
 .adm-grid-2 {
@@ -235,9 +196,9 @@
 
 /* Status Badges */
 .status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -247,13 +208,22 @@
   gap: 4px;
 }
 
-.status-pending { background: #f59e0b; color: #000; }
-.status-confirmed { background: #3b82f6; color: #fff; }
-.status-processing { background: #8b5cf6; color: #fff; }
-.status-shipped { background: #06b6d4; color: #fff; }
-.status-delivered { background: #10b981; color: #fff; }
-.status-completed { background: #22c55e; color: #fff; }
-.status-cancelled { background: #ef4444; color: #fff; }
+/* Order status — muted rgba style */
+.status-pending         { background:rgba(245,158,11,0.15);  border:1px solid rgba(245,158,11,0.4);  color:#fbbf24; }
+.status-confirmed       { background:rgba(59,130,246,0.15);  border:1px solid rgba(59,130,246,0.4);  color:#60a5fa; }
+.status-processing      { background:rgba(139,92,246,0.15);  border:1px solid rgba(139,92,246,0.4);  color:#a78bfa; }
+.status-out_for_delivery{ background:rgba(6,182,212,0.15);   border:1px solid rgba(6,182,212,0.4);   color:#22d3ee; }
+.status-completed       { background:rgba(34,197,94,0.15);   border:1px solid rgba(34,197,94,0.4);   color:#4ade80; }
+.status-cancelled       { background:rgba(239,68,68,0.15);   border:1px solid rgba(239,68,68,0.4);   color:#f87171; }
+
+/* Material status */
+.status-active          { background:rgba(34,197,94,0.15);   border:1px solid rgba(34,197,94,0.4);   color:#4ade80; }
+.status-inactive        { background:rgba(107,114,128,0.15); border:1px solid rgba(107,114,128,0.4); color:#9ca3af; }
+.status-archived        { background:rgba(107,114,128,0.15); border:1px solid rgba(107,114,128,0.4); color:#9ca3af; }
+
+/* User role */
+.status-admin           { background:rgba(255,215,0,0.15);   border:1px solid rgba(255,215,0,0.35);  color:#FFD700; }
+.status-member          { background:rgba(59,130,246,0.15);  border:1px solid rgba(59,130,246,0.3);  color:#60a5fa; }
 
 /* Activity Log */
 .log-list {
@@ -453,21 +423,7 @@ select.adm-input option:checked {
   color: #1a1a1a;
 }
 
-/* Status badges for different states */
-.status-active {
-  background: #22c55e;
-  color: #ffffff;
-}
-
-.status-inactive {
-  background: #6b7280;
-  color: #ffffff;
-}
-
-.status-out_for_delivery {
-  background: #06b6d4;
-  color: #ffffff;
-}
+/* These are now handled by .status-active / .status-inactive / .status-out_for_delivery in the badge block above */
 
 /* Modal Styles */
 .adm-modal-overlay {
@@ -655,17 +611,6 @@ select.adm-input option:checked {
   opacity: 0.8;
 }
 
-/* Chart Wrapper */
-.chart-wrap {
-  padding: 20px;
-  height: 300px;
-  position: relative;
-}
-
-/* Status colors for different order states */
-.status-red { background: #ef4444; }
-.status-gray { background: #6b7280; }
-
 /* Responsive Design */
 @media (max-width: 991px) {
   .adm-grid-2 {
@@ -794,3 +739,5 @@ select.adm-input option:checked {
   }
 }
 </style>
+
+

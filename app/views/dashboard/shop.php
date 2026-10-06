@@ -237,10 +237,6 @@
     margin-bottom: 10px; 
     line-height: 1.4;
     font-weight: 700;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
 .empty-state {
@@ -424,83 +420,24 @@
 
 <div class="container-fluid p-4">
 
-    <!-- SHOP CAROUSEL -->
-    <div id="shopCarousel" class="carousel slide mb-4" data-bs-ride="carousel" style="
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-        border: 3px solid #FFD700;
-    ">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#shopCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#shopCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#shopCarousel" data-bs-slide-to="2"></button>
-            <button type="button" data-bs-target="#shopCarousel" data-bs-slide-to="3"></button>
-        </div>
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="https://images.pexels.com/photos/1029604/pexels-photo-1029604.jpeg?auto=compress&cs=tinysrgb&w=1400"
-                     class="d-block w-100" alt="Crushed Stone"
-                     style="height:260px; object-fit:cover; filter:brightness(0.5);">
-                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
-                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Premium Crushed Stone</h5>
-                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">High-quality aggregates for construction</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="https://images.pexels.com/photos/13838908/pexels-photo-13838908.png?auto=compress&cs=tinysrgb&w=1400"
-                     class="d-block w-100" alt="Gravel"
-                     style="height:260px; object-fit:cover; filter:brightness(0.5);">
-                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
-                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Construction Gravel</h5>
-                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">Ideal for drainage and road base</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="https://images.pexels.com/photos/27523355/pexels-photo-27523355.jpeg?auto=compress&cs=tinysrgb&w=1400"
-                     class="d-block w-100" alt="Fine Sand"
-                     style="height:260px; object-fit:cover; filter:brightness(0.5);">
-                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
-                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Fine Sand</h5>
-                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">Perfect for concrete and plastering</p>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <img src="https://images.pexels.com/photos/31925745/pexels-photo-31925745.jpeg?auto=compress&cs=tinysrgb&w=1400"
-                     class="d-block w-100" alt="Quarry Materials"
-                     style="height:260px; object-fit:cover; filter:brightness(0.5);">
-                <div class="carousel-caption" style="bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); padding:30px 24px 20px; text-align:left;">
-                    <h5 style="font-weight:900; font-size:1.3rem; color:#FFD700; margin:0 0 4px;">Quarry Materials</h5>
-                    <p style="font-weight:700; color:#ffffff; margin:0; font-size:0.9rem;">Direct from quarry to your site</p>
-                </div>
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#shopCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#shopCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    </div>
-
     <!-- HEADER -->
-    <div class="shop-header">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-            <div>
-                <h2><i class="bi bi-shop me-2"></i>Shop Materials</h2>
-                <p><?= count($materials) ?> material<?= count($materials) !== 1 ? 's' : '' ?> available</p>
-            </div>
-            <form method="GET" class="d-flex gap-2">
-                <input type="hidden" name="controller" value="dashboard">
-                <input type="hidden" name="action" value="shop">
-                <input type="search" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
-                       placeholder="Search materials..."
-                       class="search-box">
-                <button type="submit" class="btn btn-light fw-bold px-4">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
+    <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:20px 8px 16px; margin-bottom:24px; animation:slideInDown 0.5s ease;">
+        <div style="font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:4px; color:rgba(255,255,255,0.3); margin-bottom:8px;">Welcome to</div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:8px;">
+            <img src="assets/imgs/logo.svg" alt="TerraForge Logo" style="width:64px; height:64px; flex-shrink:0;">
+            <h1 style="font-size:3.8rem; font-weight:900; margin:0; color:#ffffff; letter-spacing:5px; text-transform:uppercase; line-height:1;">TerraForge</h1>
         </div>
+        <div style="font-size:0.7rem; font-weight:600; color:rgba(255,255,255,0.25); letter-spacing:2.5px; text-transform:uppercase; margin-bottom:20px;">Premium Sand, Stone &amp; Gravel Supply</div>
+        <form method="GET" class="d-flex gap-2" style="justify-content:center;">
+            <input type="hidden" name="controller" value="dashboard">
+            <input type="hidden" name="action" value="shop">
+            <input type="search" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>"
+                   placeholder="Search materials..."
+                   class="search-box">
+            <button type="submit" class="btn btn-light fw-bold px-4">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
     </div>
 
     <!-- CART LINK -->
@@ -548,7 +485,31 @@
                         <div class="price">₱<?= number_format($m['unit_price'] ?? 0, 2) ?></div>
                         <div class="unit"><?= htmlspecialchars($m['unit_type'] ?? '') ?></div>
                         <?php if (!empty($m['description'])): ?>
-                        <div class="desc"><?= htmlspecialchars($m['description']) ?></div>
+                        <?php
+                          $desc = $m['description'];
+                          $did  = 'desc_' . ($m['material_id'] ?? 0);
+                          $limit = 60;
+                          $needsMore = mb_strlen($desc) > $limit;
+                          $short = mb_strimwidth($desc, 0, $limit, '');
+                        ?>
+                        <div class="desc">
+                          <?php if ($needsMore): ?>
+                            <span id="<?= $did ?>_s"><?= htmlspecialchars($short) ?>…
+                              <button onclick="document.getElementById('<?= $did ?>_s').style.display='none';document.getElementById('<?= $did ?>_f').style.display='inline';"
+                                style="background:none;border:none;color:#d97706;font-size:0.75rem;font-weight:800;cursor:pointer;padding:0;text-decoration:underline;">
+                                see more
+                              </button>
+                            </span>
+                            <span id="<?= $did ?>_f" style="display:none;"><?= htmlspecialchars($desc) ?>
+                              <button onclick="document.getElementById('<?= $did ?>_f').style.display='none';document.getElementById('<?= $did ?>_s').style.display='inline';"
+                                style="background:none;border:none;color:#d97706;font-size:0.75rem;font-weight:800;cursor:pointer;padding:0;text-decoration:underline;">
+                                see less
+                              </button>
+                            </span>
+                          <?php else: ?>
+                            <?= htmlspecialchars($desc) ?>
+                          <?php endif; ?>
+                        </div>
                         <?php endif; ?>
                     </div>
                     
@@ -974,15 +935,17 @@ function addToCart(materialId) {
     window.location.href = '?controller=cart&action=add&id=' + materialId;
 }
 
-// Buy Now: add to cart then redirect to checkout
+// Buy Now: open modal then override confirm button
 function buyNow(materialId, name, price, unit, stock, imagePath) {
     openAddToCartModal(materialId, name, price, unit, stock, imagePath);
-    // Override the confirm button to redirect to checkout after adding
-    const confirmBtn = document.querySelector('#addToCartModal button[onclick="confirmAddToCart()"]');
-    if (confirmBtn) {
-        confirmBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>Buy Now';
-        confirmBtn.setAttribute('onclick', 'confirmBuyNow()');
-    }
+    // Use setTimeout to ensure modal is fully rendered before changing button
+    setTimeout(function() {
+        const confirmBtn = document.querySelector('#addToCartModal button[onclick="confirmAddToCart()"]');
+        if (confirmBtn) {
+            confirmBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>Buy Now';
+            confirmBtn.setAttribute('onclick', 'confirmBuyNow()');
+        }
+    }, 50);
 }
 
 function confirmBuyNow() {
@@ -993,7 +956,7 @@ function confirmBuyNow() {
     button.disabled = true;
     button.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Processing...';
 
-    fetch(`?controller=cart&action=add&id=${currentMaterial.id}&quantity=${quantity}`, {
+    fetch(`?controller=cart&action=buyNowDirect&id=${currentMaterial.id}&quantity=${quantity}`, {
         method: 'GET',
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
@@ -1005,7 +968,7 @@ function confirmBuyNow() {
         } else {
             button.disabled = false;
             button.innerHTML = originalContent;
-            showSuccessMessage(data.message || 'Failed to add item.', true);
+            showSuccessMessage(data.message || 'Failed to process. Please try again.', true);
         }
     })
     .catch(() => {

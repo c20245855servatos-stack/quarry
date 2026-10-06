@@ -12,6 +12,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TerraForge</title>
 
+  <link rel="icon" type="image/svg+xml" href="/assets/imgs/logo.svg">
+  <link rel="icon" type="image/png" href="/assets/imgs/terraforge-logo.png">
+  <link rel="shortcut icon" href="/assets/imgs/terraforge-logo.png">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
   
@@ -372,9 +376,6 @@
 
     .sidebar-hamburger:active {
       transform: translateY(0) scale(0.98);
-    }
-      transform: translateY(-0.125rem) scale(1.05);
-      box-shadow: var(--shadow-lg);
     }
 
     /* Mobile sidebar overlay */
@@ -1043,6 +1044,32 @@
     transition: width 0.3s ease;
     box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
   }
+
+  /* ── Shared Confirmation Modal (sys-modal) ── */
+  .sys-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:99999;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility .25s ease;padding:16px}
+  .sys-modal-overlay.open{opacity:1;visibility:visible;pointer-events:auto}
+  .sys-modal{background:#1c1c1c;border:2px solid #FFD700;border-radius:18px;padding:36px 28px 28px;width:100%;max-width:400px;text-align:center;box-shadow:0 32px 80px rgba(0,0,0,0.8);transform:translateY(-20px) scale(.96);transition:transform .28s cubic-bezier(.34,1.56,.64,1)}
+  .sys-modal-overlay.open .sys-modal{transform:translateY(0) scale(1)}
+  .sys-modal-icon{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin:0 auto 20px;border:2px solid}
+  .sys-modal-icon.red{background:rgba(185,28,28,0.25);border-color:#b91c1c;color:#ef4444}
+  .sys-modal-icon.green{background:rgba(22,163,74,0.2);border-color:#16a34a;color:#4ade80}
+  .sys-modal-icon.yellow{background:rgba(202,138,4,0.2);border-color:#ca8a04;color:#FFD700}
+  .sys-modal-icon.gray{background:rgba(75,85,99,0.25);border-color:#4b5563;color:#9ca3af}
+  .sys-modal-title{font-size:1.25rem;font-weight:900;color:#fff;margin:0 0 10px;letter-spacing:0.3px}
+  .sys-modal-msg{font-size:0.88rem;color:rgba(255,255,255,0.55);font-weight:600;line-height:1.6;margin:0 0 28px}
+  .sys-modal-msg strong{color:rgba(255,255,255,0.85);font-weight:700}
+  .sys-modal-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .sys-modal-btns > button,.sys-modal-btns > a{padding:13px 10px;border-radius:10px;font-size:0.88rem;font-weight:800;cursor:pointer;border:none;transition:all .2s ease;display:inline-flex;align-items:center;justify-content:center;gap:7px;text-decoration:none;letter-spacing:0.2px}
+  .sys-btn-cancel{background:#2d2d2d;color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.1)!important}
+  .sys-btn-cancel:hover{background:#3a3a3a;color:#fff}
+  .sys-btn-red{background:#dc2626;color:#fff}
+  .sys-btn-red:hover{background:#b91c1c;box-shadow:0 4px 16px rgba(220,38,38,0.45);transform:translateY(-1px)}
+  .sys-btn-green{background:#16a34a;color:#fff}
+  .sys-btn-green:hover{background:#15803d;box-shadow:0 4px 16px rgba(22,163,74,0.4);transform:translateY(-1px)}
+  .sys-btn-yellow{background:#FFD700;color:#1a1a1a}
+  .sys-btn-yellow:hover{background:#FFB000;box-shadow:0 4px 16px rgba(255,215,0,0.4);transform:translateY(-1px)}
+  .sys-btn-gray{background:#4b5563;color:#fff}
+  .sys-btn-gray:hover{background:#374151;transform:translateY(-1px)}
 </style>
 </head>
 
@@ -1165,8 +1192,8 @@
       <!-- MAIN MENU - Only for regular users -->
       <div class="section-label">Main Menu</div>
       <ul class="nav flex-column">
-        <li><a class="nav-link <?= $currentPage === 'dashboard/index' ? 'active' : '' ?>" href="?controller=dashboard&action=index"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
         <li><a class="nav-link <?= $currentPage === 'dashboard/shop' ? 'active' : '' ?>" href="?controller=dashboard&action=shop"><i class="bi bi-bag"></i> Shop Materials</a></li>
+        <li><a class="nav-link <?= $currentPage === 'dashboard/index' ? 'active' : '' ?>" href="?controller=dashboard&action=index"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
         <li><a class="nav-link <?= $currentPage === 'dashboard/orders' ? 'active' : '' ?>" href="?controller=dashboard&action=orders"><i class="bi bi-box-seam"></i> My Orders</a></li>
         <li><a class="nav-link <?= $currentPage === 'dashboard/settings' ? 'active' : '' ?>" href="?controller=dashboard&action=settings"><i class="bi bi-gear"></i> Settings</a></li>
       </ul>

@@ -444,7 +444,7 @@ body::before {
             <div class="i-icon"><i class="bi bi-geo-alt-fill"></i></div>
             <div class="i-text">
                 <strong>Location</strong>
-                <span>Philippines</span>
+                <span>Ambulong, Talisay City, Negros Occidental</span>
             </div>
         </div>
 

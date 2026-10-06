@@ -23,30 +23,74 @@
   $filterStatus = $_GET['status'] ?? 'all';
   $currentPage = $_GET['page'] ?? 1;
   
-  // Get all orders for counting (we'll optimize this later if needed)
-  $allOrders = $this->material->allOrders();
+  // Get all orders for counting
+  require_once BASE_PATH . '/app/models/Material.php';
+  $_materialForCount = new Material();
+  $allOrders = $_materialForCount->allOrders();
+
+  $statusIcons = [
+    'all'              => 'bi-grid-fill',
+    'pending'          => 'bi-hourglass-split',
+    'confirmed'        => 'bi-check-circle',
+    'processing'       => 'bi-gear',
+    'out_for_delivery' => 'bi-truck',
+    'completed'        => 'bi-check-circle-fill',
+    'cancelled'        => 'bi-x-circle',
+  ];
   ?>
-  <div class="adm-card" style="margin-bottom:24px;">
-    <div class="adm-card-head" style="background:linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,176,0,0.05)); border-bottom:2px solid rgba(255,215,0,0.2);">
-      <span style="color:#FFD700; font-weight:900; font-size:1.1rem; text-shadow:0 2px 4px rgba(0,0,0,0.3); letter-spacing:0.5px;">
-        <i class="bi bi-funnel me-2"></i>Filter by Status
-      </span>
-    </div>
-    <div style="padding:20px;">
-      <div style="display:flex; gap:12px; flex-wrap:wrap;">
-        <?php foreach ($statuses as $s): ?>
-          <?php $cnt = $s === 'all' ? count($allOrders) : count(array_filter($allOrders, fn($o) => ($o['order_status'] ?? '') === $s)); ?>
-          <a href="?controller=admin&action=orders&status=<?= $s ?>&page=1" 
-             style="padding:12px 20px; border-radius:10px; font-size:0.85rem; font-weight:700; text-decoration:none; text-transform:uppercase; letter-spacing:0.5px; transition:all 0.3s ease; display:flex; align-items:center; gap:8px;
-                    <?= $filterStatus === $s 
-                        ? 'background:linear-gradient(135deg, #22c55e, #16a34a); color:white; border:2px solid #16a34a; box-shadow:0 4px 15px rgba(34,197,94,0.3);' 
-                        : 'background:rgba(255,255,255,0.05); color:rgba(255,255,255,0.8); border:2px solid rgba(255,255,255,0.1);' ?>">
-            <?= ucfirst(str_replace('_',' ',$s)) ?>
-            <span style="background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:900;"><?= $cnt ?></span>
-          </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
+
+  <style>
+  .order-filter-btn {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.75);
+    padding: 9px 18px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: 0.2s ease;
+  }
+  .order-filter-btn:hover {
+    background: rgba(255,215,0,0.15);
+    border-color: #FFD700;
+    color: #FFD700;
+    text-decoration: none;
+  }
+  .order-filter-btn.active {
+    background: #FFD700;
+    border-color: #FFD700;
+    color: #1a1a1a;
+    text-decoration: none;
+  }
+  .order-filter-btn .filter-count {
+    background: rgba(0,0,0,0.15);
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 900;
+  }
+  .order-filter-btn.active .filter-count {
+    background: rgba(0,0,0,0.2);
+  }
+  </style>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; align-items:center;">
+    <?php foreach ($statuses as $s):
+      $cnt = $s === 'all' ? count($allOrders) : count(array_filter($allOrders, fn($o) => ($o['order_status'] ?? '') === $s));
+      $icon = $statusIcons[$s] ?? 'bi-circle';
+      $label = ucfirst(str_replace('_', ' ', $s));
+      $url = '?controller=admin&action=orders&status=' . $s . '&page=1';
+      $isActive = $filterStatus === $s;
+    ?>
+    <a href="<?= $url ?>" class="order-filter-btn <?= $isActive ? 'active' : '' ?>">
+      <i class="bi <?= $icon ?>"></i> <?= $label ?>
+    </a>
+    <?php endforeach; ?>
   </div>
 
   <!-- PAGINATION INFO -->
@@ -180,10 +224,20 @@
               <div style="color:var(--text-secondary);"><?= date('H:i', strtotime($o['created_at'] ?? '')) ?></div>
             </td>
             <td style="white-space:nowrap;">
+              <?php
+                $status = strtolower($o['order_status'] ?? 'pending');
+                $locked = in_array($status, ['cancelled', 'completed']);
+              ?>
+              <?php if ($locked): ?>
+                <span class="status-badge status-<?= $status ?>" style="padding:6px 12px; font-size:0.78rem;">
+                  <?= $status === 'completed' ? '<i class="bi bi-check-circle-fill me-1"></i> Completed' : '<i class="bi bi-x-circle-fill me-1"></i> Cancelled' ?>
+                </span>
+              <?php else: ?>
               <button class="adm-btn adm-btn-blue" style="padding:6px 12px; font-size:0.78rem;"
                 onclick="openUpdateModal(<?= $o['order_id'] ?? 0 ?>, '<?= $o['order_status'] ?? 'pending' ?>', '<?= $o['delivery_date'] ?? '' ?>', '<?= $o['arrival_date'] ?? '' ?>', '<?= $o['created_at'] ?? '' ?>')">
                 <i class="bi bi-pencil-fill"></i> Update
               </button>
+              <?php endif; ?>
             </td>
           </tr>
           <?php endforeach; ?>
@@ -235,28 +289,39 @@
     <form method="POST" action="?controller=admin&action=updateOrder">
       <input type="hidden" name="_csrf" value="<?= Csrf::generate() ?>">
       <input type="hidden" name="order_id" id="upd_order_id">
+
       <div class="adm-form-group">
         <label>Order Status</label>
-        <select class="adm-input" name="status" id="upd_status" style="background: #1a1a1a; color: #ffffff; border: 2px solid #FFD700;">
-          <option value="pending" style="background: #1a1a1a; color: #ffffff;">Pending</option>
-          <option value="confirmed" style="background: #1a1a1a; color: #ffffff;">Confirmed</option>
-          <option value="processing" style="background: #1a1a1a; color: #ffffff;">Processing</option>
-          <option value="out_for_delivery" style="background: #1a1a1a; color: #ffffff;">Out for Delivery</option>
-          <option value="completed" style="background: #1a1a1a; color: #ffffff;">Completed</option>
-          <option value="cancelled" style="background: #1a1a1a; color: #ffffff;">Cancelled</option>
+        <select class="adm-input" name="status" id="upd_status"
+                style="background:#1a1a1a;color:#fff;border:2px solid #FFD700;"
+                onchange="toggleDateFields(this.value)">
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="processing">Processing</option>
+          <option value="out_for_delivery">Out for Delivery</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
-      <div class="adm-form-group">
-        <label>Delivery Date</label>
-        <input class="adm-input" type="date" name="delivery_date" id="upd_delivery_date">
-        <small id="delivery_hint" style="color:#FFD700; font-weight:700; font-size:0.78rem; margin-top:4px; display:block;"></small>
+
+      <!-- Date fields — only shown when Out for Delivery is selected -->
+      <div id="upd_date_fields" style="display:none;">
+        <div style="background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;font-weight:700;color:#FFD700;">
+          <i class="bi bi-calendar-date me-2"></i>Set the scheduled delivery and arrival dates.
+        </div>
+        <div class="adm-form-group">
+          <label>Delivery Date</label>
+          <input class="adm-input" type="date" name="delivery_date" id="upd_delivery_date">
+          <small id="delivery_hint" style="color:#FFD700;font-weight:700;font-size:0.78rem;margin-top:4px;display:block;"></small>
+        </div>
+        <div class="adm-form-group">
+          <label>Arrival Date <small style="color:#666;">(When items actually arrived)</small></label>
+          <input class="adm-input" type="date" name="arrival_date" id="upd_arrival_date">
+          <small id="arrival_hint" style="color:#aaa;font-weight:600;font-size:0.78rem;margin-top:4px;display:block;"></small>
+        </div>
       </div>
-      <div class="adm-form-group">
-        <label>Arrival Date <small style="color:#666;">(When items actually arrived)</small></label>
-        <input class="adm-input" type="date" name="arrival_date" id="upd_arrival_date">
-        <small id="arrival_hint" style="color:#aaa; font-weight:600; font-size:0.78rem; margin-top:4px; display:block;"></small>
-      </div>
-      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
         <button type="button" class="adm-btn adm-btn-gray" onclick="closeModal('updateModal')">Cancel</button>
         <button type="submit" class="adm-btn adm-btn-green"><i class="bi bi-check-lg"></i> Save Changes</button>
       </div>
@@ -268,9 +333,17 @@
 function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
+function toggleDateFields(status) {
+  const show = status === 'pending' || status === 'confirmed';
+  document.getElementById('upd_date_fields').style.display = show ? 'block' : 'none';
+}
+
 function openUpdateModal(orderId, status, deliveryDate, arrivalDate, orderDate) {
   document.getElementById('upd_order_id').value = orderId;
   document.getElementById('upd_status').value   = status;
+
+  // Show date fields only if out_for_delivery
+  toggleDateFields(status);
 
   // Calculate estimated arrival window (6–8 business days, skip Sundays)
   function addBusinessDays(startDate, days) {
@@ -292,7 +365,7 @@ function openUpdateModal(orderId, status, deliveryDate, arrivalDate, orderDate) 
   }
 
   const base = orderDate ? new Date(orderDate) : new Date();
-  const estStart = addBusinessDays(base, 6);
+  const estStart = addBusinessDays(base, 3);
   const estEnd   = addBusinessDays(base, 8);
 
   const estStartYMD = toYMD(estStart);
@@ -317,9 +390,9 @@ function openUpdateModal(orderId, status, deliveryDate, arrivalDate, orderDate) 
     `Estimated window: ${formatDate(estStart)} – ${formatDate(estEnd)} (Mon–Sat only)`;
 
   // Keep arrival min in sync when delivery date changes
-  deliveryInput.addEventListener('change', function() {
+  deliveryInput.onchange = function() {
     arrivalInput.min = this.value || estStartYMD;
-  });
+  };
 
   openModal('updateModal');
 }

@@ -86,7 +86,7 @@ class AuthController
         if ($user['is_admin']) {
             header("Location: ?controller=admin&action=index");
         } else {
-            header("Location: ?controller=dashboard&action=index");
+            header("Location: ?controller=dashboard&action=shop");
         }
         exit();
     }

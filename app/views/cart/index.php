@@ -597,11 +597,11 @@ body {
                     <i class="bi bi-pencil-fill"></i>
                     Edit
                 </button>
-                <form method="POST" action="?controller=cart&action=remove" style="margin:0;"
-                      onsubmit="return confirm('Remove this item from cart?')">
+                <form method="POST" action="?controller=cart&action=remove" style="margin:0;" id="removeForm_<?= (int)($item['id'] ?? $item['material_id'] ?? 0) ?>">
                     <input type="hidden" name="_csrf" value="<?= Csrf::generate() ?>">
                     <input type="hidden" name="id" value="<?= (int)($item['id'] ?? $item['material_id'] ?? 0) ?>">
-                    <button type="submit" class="cart-item-remove">
+                    <button type="button" class="cart-item-remove"
+                        onclick="openRemoveConfirm(<?= (int)($item['id'] ?? $item['material_id'] ?? 0) ?>, '<?= htmlspecialchars(addslashes($item['name'] ?? $item['material_name'] ?? ''), ENT_QUOTES) ?>')">
                         <i class="bi bi-trash"></i>
                         Remove
                     </button>
@@ -611,8 +611,8 @@ body {
     </div>
 
     <?php 
-    $vat = $subtotal * 0.12;
-    $total = $subtotal + $vat;
+    $delivery_fee = 500.00;
+    $total = $subtotal + $delivery_fee;
     ?>
 
     <div class="cart-summary">
@@ -621,8 +621,8 @@ body {
             <span>₱<?= number_format($subtotal, 2) ?></span>
         </div>
         <div class="summary-row">
-            <span>VAT (12%):</span>
-            <span>₱<?= number_format($vat, 2) ?></span>
+            <span>Delivery Fee:</span>
+            <span>₱<?= number_format($delivery_fee, 2) ?></span>
         </div>
         <div class="summary-divider">
             <div class="summary-total">
@@ -773,6 +773,50 @@ function saveEditQty() {
 // Close on backdrop click
 document.getElementById('editQtyModal').addEventListener('click', function(e) {
     if (e.target === this) closeEditQty();
+});
+</script>
+
+<!-- Remove Item Confirmation Modal -->
+<div class="sys-modal-overlay" id="removeConfirmOverlay">
+  <div class="sys-modal">
+    <div class="sys-modal-icon red"><i class="bi bi-trash-fill"></i></div>
+    <div class="sys-modal-title">Remove Item</div>
+    <div class="sys-modal-msg">Remove <strong id="removeItemName"></strong> from your cart?</div>
+    <div class="sys-modal-btns">
+      <button class="sys-btn-cancel" onclick="closeRemoveConfirm()">Cancel</button>
+      <button class="sys-btn-red" onclick="submitRemoveForm()">
+        <i class="bi bi-trash-fill"></i> Remove
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let pendingRemoveId = null;
+
+function openRemoveConfirm(itemId, itemName) {
+  pendingRemoveId = itemId;
+  document.getElementById('removeItemName').textContent = itemName;
+  document.getElementById('removeConfirmOverlay').classList.add('open');
+}
+
+function closeRemoveConfirm() {
+  pendingRemoveId = null;
+  document.getElementById('removeConfirmOverlay').classList.remove('open');
+}
+
+function submitRemoveForm() {
+  if (pendingRemoveId !== null) {
+    document.getElementById('removeForm_' + pendingRemoveId).submit();
+  }
+}
+
+document.getElementById('removeConfirmOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeRemoveConfirm();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeRemoveConfirm();
 });
 </script>
 

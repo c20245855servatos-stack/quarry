@@ -360,42 +360,53 @@ body::before {
 
             <div class="form-group">
                 <label>Full Name</label>
-                <input type="text" name="full_name" placeholder="Enter your full name" required>
+                <input type="text" name="full_name" placeholder="Enter your full name" required
+                       data-no-emoji="true" maxlength="100">
             </div>
 
             <div class="form-group">
                 <label>Contact Number</label>
-                <input type="text" name="contact_number" placeholder="Enter your contact number">
+                <input type="tel" name="contact_number" id="contact_number"
+                       placeholder="e.g. 09171234567 or +639171234567"
+                       data-phone="true" maxlength="16" autocomplete="tel" required>
+                <span id="phone_hint" style="font-size:0.75rem;font-weight:600;margin-top:3px;display:none;"></span>
             </div>
 
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" placeholder="Enter your email" required>
+                <input type="email" name="email" placeholder="Enter your email" required maxlength="150">
             </div>
 
             <div class="form-group">
                 <label>Address</label>
-                <textarea name="address" placeholder="Enter your address"></textarea>
+                <?php require BASE_PATH . '/app/views/layouts/address_selector.php'; ?>
+                <?php renderAddressSelector('address', '', '', true); ?>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
                 <div class="password-input-wrapper">
-                    <input type="password" name="password" id="password" placeholder="Create a strong password" required>
+                    <input type="password" name="password" id="password"
+                           placeholder="Create a strong password" required minlength="6"
+                           oninput="validatePasswordStrength(this); stripEmojiFromInput(this)">
                     <button type="button" class="password-toggle" onclick="togglePassword('password')">
                         <i class="bi bi-eye" id="password-eye"></i>
                     </button>
                 </div>
+                <span id="password_hint" style="font-size:0.75rem;font-weight:600;margin-top:-6px;margin-bottom:4px;display:none;"></span>
             </div>
 
             <div class="form-group">
                 <label>Confirm Password</label>
                 <div class="password-input-wrapper">
-                    <input type="password" name="password_confirm" id="password_confirm" placeholder="Confirm your password" required>
+                    <input type="password" name="password_confirm" id="password_confirm"
+                           placeholder="Confirm your password" required
+                           oninput="validatePasswordMatch(this); stripEmojiFromInput(this)">
                     <button type="button" class="password-toggle" onclick="togglePassword('password_confirm')">
                         <i class="bi bi-eye" id="password_confirm-eye"></i>
                     </button>
                 </div>
+                <span id="confirm_hint" style="font-size:0.75rem;font-weight:600;margin-top:-6px;margin-bottom:4px;display:none;"></span>
             </div>
 
             <!-- ACTIONS -->
@@ -408,6 +419,12 @@ body::before {
                 </a>
             </div>
 
+            <!-- Validation error banner -->
+            <div id="reg_error_banner" style="display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.4); border-radius:8px; padding:12px 16px; margin-top:12px; font-size:0.85rem; font-weight:700; color:#f87171; line-height:1.6;">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                <span id="reg_error_text"></span>
+            </div>
+
         </form>
 
     </div>
@@ -417,22 +434,216 @@ body::before {
 function togglePassword(fieldId) {
     const field = document.getElementById(fieldId);
     const eyeIcon = document.getElementById(fieldId + '-eye');
-    
-    if (!field || !eyeIcon) {
-        console.error('Field or icon not found:', fieldId);
-        return;
-    }
-    
+    if (!field || !eyeIcon) return;
     if (field.type === 'password') {
         field.type = 'text';
-        eyeIcon.classList.remove('bi-eye');
-        eyeIcon.classList.add('bi-eye-slash');
+        eyeIcon.classList.replace('bi-eye', 'bi-eye-slash');
     } else {
         field.type = 'password';
-        eyeIcon.classList.remove('bi-eye-slash');
-        eyeIcon.classList.add('bi-eye');
+        eyeIcon.classList.replace('bi-eye-slash', 'bi-eye');
     }
 }
+
+function validatePasswordStrength(el) {
+    const hint = document.getElementById('password_hint');
+    const val = el.value;
+    if (val.length === 0) {
+        el.style.borderColor = '';
+        hint.style.display = 'none';
+        return;
+    }
+    if (val.length < 6) {
+        el.style.borderColor = '#ef4444';
+        hint.textContent = '✗ Password must be at least 6 characters';
+        hint.style.color = '#ef4444';
+        hint.style.display = 'block';
+    } else {
+        el.style.borderColor = '#22c55e';
+        hint.textContent = '✓ Password looks good';
+        hint.style.color = '#22c55e';
+        hint.style.display = 'block';
+    }
+    // Re-validate confirm if already filled
+    const confirm = document.getElementById('password_confirm');
+    if (confirm && confirm.value.length > 0) validatePasswordMatch(confirm);
+}
+
+function validatePasswordMatch(el) {
+    const hint = document.getElementById('confirm_hint');
+    const password = document.getElementById('password').value;
+    if (el.value.length === 0) {
+        el.style.borderColor = '';
+        hint.style.display = 'none';
+        return;
+    }
+    if (el.value !== password) {
+        el.style.borderColor = '#ef4444';
+        hint.textContent = '✗ Passwords do not match';
+        hint.style.color = '#ef4444';
+        hint.style.display = 'block';
+    } else {
+        el.style.borderColor = '#22c55e';
+        hint.textContent = '✓ Passwords match';
+        hint.style.color = '#22c55e';
+        hint.style.display = 'block';
+    }
+}
+
+// ── Emoji / invalid character blocking ──
+const EMOJI_RE = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{1F300}-\u{1F9FF}\u{FE00}-\u{FEFF}\u{200B}-\u{200F}]/gu;
+const NAME_RE  = /[^\p{L}\p{M}\s'\-\.]/gu;
+const PHONE_RE = /[^\d\s\+\-\(\)]/g;
+const ADDR_RE  = /[^\p{L}\p{M}\p{N}\s,\.#\-\/\(\)]/gu;
+
+function cleanInput(el) {
+    const re = el.dataset.phone ? PHONE_RE
+             : el.dataset.noEmoji && el.name === 'address' ? ADDR_RE
+             : el.dataset.noEmoji ? NAME_RE
+             : EMOJI_RE;
+
+    const pos = el.selectionStart;
+    const before = el.value;
+    const after  = before.replace(re, '');
+    if (before !== after) {
+        el.value = after;
+        const diff = before.length - after.length;
+        el.setSelectionRange(Math.max(0, pos - diff), Math.max(0, pos - diff));
+    }
+}
+
+// ── PH Phone validation ──
+function normalizePHPhone(raw) {
+    const clean = raw.replace(/[\s\-]/g, '');
+    const m = clean.match(/^(?:\+63|63|0)(9\d{9})$/);
+    return m ? '+63' + m[1] : null;
+}
+
+function validatePhoneField(el) {
+    const hint = document.getElementById('phone_hint');
+    const val  = el.value.trim();
+    if (val === '') {
+        el.style.borderColor = '';
+        if (hint) hint.style.display = 'none';
+        return;
+    }
+    const normalized = normalizePHPhone(val);
+    if (normalized) {
+        el.style.borderColor = '#22c55e';
+        if (hint) {
+            hint.textContent = '✓ Valid — will be saved as ' + normalized;
+            hint.style.color = '#22c55e';
+            hint.style.display = 'block';
+        }
+    } else {
+        el.style.borderColor = '#ef4444';
+        if (hint) {
+            hint.textContent = '✗ Must be a valid PH mobile number (e.g. 09171234567)';
+            hint.style.color = '#ef4444';
+            hint.style.display = 'block';
+        }
+    }
+}
+
+// ── Global emoji stripper (used by password fields) ──
+function stripEmojiField(el) {
+    const re = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{1F300}-\u{1F9FF}\u{FE00}-\u{FEFF}\u{200B}-\u{200F}]/gu;
+    const pos = el.selectionStart;
+    const before = el.value;
+    const after = before.replace(re, '');
+    if (before !== after) {
+        el.value = after;
+        const diff = before.length - after.length;
+        try { el.setSelectionRange(Math.max(0, pos - diff), Math.max(0, pos - diff)); } catch(e) {}
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    function showRegError(msg) {
+        const banner = document.getElementById('reg_error_banner');
+        const text   = document.getElementById('reg_error_text');
+        if (!banner || !text) return;
+        text.textContent = msg;
+        banner.style.display = 'block';
+        banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function hideRegError() {
+        const banner = document.getElementById('reg_error_banner');
+        if (banner) banner.style.display = 'none';
+    }
+    // Tagged inputs (name, phone, address)
+    document.querySelectorAll('[data-no-emoji], [data-phone]').forEach(el => {
+        el.addEventListener('input', () => cleanInput(el));
+        el.addEventListener('paste', () => setTimeout(() => cleanInput(el), 0));
+    });
+
+    // All other text/password/email inputs — strip emoji only
+    document.querySelectorAll('input[type="text"]:not([data-no-emoji]):not([data-phone]):not([readonly]), input[type="password"], input[type="email"]').forEach(el => {
+        el.addEventListener('input', () => stripEmojiField(el));
+        el.addEventListener('paste', () => setTimeout(() => stripEmojiField(el), 0));
+    });
+
+    // PH phone live validation
+    const phoneEl = document.getElementById('contact_number');
+    if (phoneEl) {
+        phoneEl.addEventListener('input',  () => validatePhoneField(phoneEl));
+        phoneEl.addEventListener('blur',   () => validatePhoneField(phoneEl));
+        phoneEl.addEventListener('paste',  () => setTimeout(() => validatePhoneField(phoneEl), 0));
+    }
+
+    // Block form submit if phone is filled but invalid
+    const form = phoneEl?.closest('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            hideRegError();
+
+            const fullName    = form.querySelector('input[name="full_name"]');
+            const phone       = document.getElementById('contact_number');
+            const email       = form.querySelector('input[name="email"]');
+            const password    = document.getElementById('password');
+            const confirmPwd  = document.getElementById('password_confirm');
+            const citySelect  = form.querySelector('select[id$="_city"]');
+            const brgySelect  = form.querySelector('select[id$="_brgy"]');
+            const streetInput = form.querySelector('input[id$="_st"]');
+
+            // Reset borders
+            [fullName, phone, email, password, confirmPwd, citySelect, brgySelect, streetInput]
+                .forEach(el => { if (el) el.style.borderColor = ''; });
+
+            const fail = (el, msg) => {
+                if (el) { el.style.borderColor = '#ef4444'; el.focus(); }
+                showRegError(msg);
+                e.preventDefault();
+            };
+
+            if (!fullName?.value.trim())
+                return fail(fullName, 'Full name is required.');
+
+            if (!phone?.value.trim())
+                return fail(phone, 'Contact number is required.');
+
+            if (!normalizePHPhone(phone.value.trim()))
+                return fail(phone, 'Please enter a valid Philippine mobile number (e.g. 09171234567).');
+
+            if (!email?.value.trim())
+                return fail(email, 'Email address is required.');
+
+            if (!citySelect?.value)
+                return fail(citySelect, 'Please select your City / Municipality.');
+
+            if (!brgySelect?.value)
+                return fail(brgySelect, 'Please select your Barangay.');
+
+            if (!streetInput?.value.trim())
+                return fail(streetInput, 'Street / Road name is required.');
+
+            if (!password?.value || password.value.length < 6)
+                return fail(password, 'Password must be at least 6 characters.');
+
+            if (!confirmPwd?.value || confirmPwd.value !== password.value)
+                return fail(confirmPwd, 'Passwords do not match.');
+        });
+    }
+});
 </script>
 
 <?php

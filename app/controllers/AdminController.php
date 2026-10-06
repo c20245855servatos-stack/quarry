@@ -35,7 +35,7 @@ class AdminController
                 'materials' => $this->material->count() ?? 0,
                 'orders'    => $this->material->ordersCount() ?? 0,
                 'pending'   => $this->material->pendingOrdersCount() ?? 0,
-                'revenue'   => $this->material->totalRevenue() ?? 0,
+                'revenue'    => $this->material->totalRevenue() ?? 0,
             ];
             $recentOrders = $this->material->recentOrders(6) ?? [];
             $recentLog    = $this->material->activityLog(5) ?? [];
@@ -309,6 +309,14 @@ class AdminController
         $deliveryDate = trim($_POST['delivery_date']  ?? '') ?: null;
         $arrivalDate  = trim($_POST['arrival_date']   ?? '') ?: null;
 
+        // Block editing cancelled or completed orders
+        $existingOrder = $this->material->findOrder($id);
+        $currentStatus = strtolower($existingOrder['order_status'] ?? '');
+        if (in_array($currentStatus, ['cancelled', 'completed'])) {
+            Flash::set('error', "Order #{$id} is {$currentStatus} and cannot be edited.");
+            redirect('admin', 'orders');
+        }
+
         $allowed = ['pending','confirmed','processing','out_for_delivery','completed','cancelled'];
         if (!in_array($status, $allowed, true)) {
             $status = 'pending';
@@ -364,8 +372,15 @@ class AdminController
     {
         $salesByMonth = $this->material->salesByMonth();
         $topMaterials = $this->material->topMaterials();
-        $totalRevenue = $this->material->totalRevenue();
-        $allOrders    = $this->material->allOrders();
+
+        // Month filter — default to current month
+        $selectedYear  = (int)($_GET['rev_year']  ?? date('Y'));
+        $selectedMonth = (int)($_GET['rev_month'] ?? date('n'));
+
+        $totalRevenue    = $this->material->totalRevenueByMonth($selectedYear, $selectedMonth);
+        $availableMonths = $this->material->availableRevenueMonths();
+        $allOrders       = $this->material->allOrders();
+
         require __DIR__ . '/../views/admin/sales.php';
     }
 
@@ -511,17 +526,29 @@ class AdminController
         }
 
         $materialId = (int)($_POST['material_id'] ?? 0);
-        $quantity = (int)($_POST['quantity'] ?? 0);
-        $reason = trim($_POST['reason'] ?? '');
+        $quantity   = (int)($_POST['quantity'] ?? 0);
+        $reason     = trim($_POST['reason'] ?? '');
 
-        if ($materialId <= 0 || $quantity <= 0) {
-            Flash::set('error', 'Invalid material ID or quantity.');
+        if ($materialId <= 0 || $quantity <= 0 || $quantity > 999) {
+            Flash::set('error', 'Quantity must be between 1 and 999.');
             redirect('admin', 'stockManagement');
         }
 
         $material = $this->material->find($materialId);
         if (!$material) {
             Flash::set('error', 'Material not found.');
+            redirect('admin', 'stockManagement');
+        }
+
+        // Enforce max stock of 600
+        $currentStock = (int)($material['stock_quantity'] ?? 0);
+        if ($currentStock + $quantity > 600) {
+            $canAdd = max(0, 600 - $currentStock);
+            if ($canAdd === 0) {
+                Flash::set('error', "'{$material['material_name']}' is already at maximum stock (600 units).");
+            } else {
+                Flash::set('error', "Cannot add {$quantity} units — would exceed the 600-unit maximum. You can add up to {$canAdd} more units.");
+            }
             redirect('admin', 'stockManagement');
         }
 
@@ -547,7 +574,8 @@ class AdminController
 
     public function getStockAlerts(): void
     {
-        header('Content-Type: application/json');
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
         
         try {
             $alerts = $this->material->getStockAlerts();

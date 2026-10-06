@@ -18,39 +18,100 @@
   </div>
 
   <!-- STATS ROW -->
-  <div class="adm-stats" style="margin-bottom:24px; grid-template-columns: repeat(3, 1fr);">
-    <div class="stat-card">
+  <style>
+  .stat-card-clickable {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    border: 2px solid transparent;
+    user-select: none;
+  }
+  .stat-card-clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .stat-card-clickable.filter-active-card {
+    border-color: #FFD700;
+    box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
+  }
+  .mat-filter-btn {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.75);
+    padding: 9px 18px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mat-filter-btn:hover {
+    background: rgba(255,215,0,0.15);
+    border-color: #FFD700;
+    color: #FFD700;
+  }
+  .mat-filter-btn.active {
+    background: #FFD700;
+    border-color: #FFD700;
+    color: #1a1a1a;
+  }
+  </style>
+
+  <?php
+    $totalCount    = count($materials ?? []);
+    $activeCount   = count(array_filter($materials ?? [], fn($m) => $m['is_active'] ?? false));
+    $inactiveCount = count(array_filter($materials ?? [], fn($m) => !($m['is_active'] ?? true)));
+  ?>
+  <div class="adm-stats mat-stats-grid" style="margin-bottom:24px;">
+    <style>
+    .mat-stats-grid { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 575px) {
+      .mat-stats-grid { grid-template-columns: 1fr; }
+      .mat-stats-grid .stat-card { flex-direction: row; align-items: center; }
+      .mat-stats-grid .stat-num { font-size: 1.4rem; }
+      .mat-stats-grid .stat-lbl { font-size: 0.72rem; white-space: normal; }
+    }
+    </style>
+    <div class="stat-card stat-card-clickable filter-active-card" id="statAll" onclick="setMatFilter('all', this)">
       <div class="stat-icon green"><i class="bi bi-layers-fill"></i></div>
       <div class="stat-body">
-        <div class="stat-num"><?= count($materials ?? []) ?></div>
+        <div class="stat-num"><?= $totalCount ?></div>
         <div class="stat-lbl">Total Materials</div>
       </div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card stat-card-clickable" id="statActive" onclick="setMatFilter('active', this)">
       <div class="stat-icon blue"><i class="bi bi-check-circle-fill"></i></div>
       <div class="stat-body">
-        <div class="stat-num"><?= count(array_filter($materials ?? [], fn($m) => $m['is_active'] ?? false)) ?></div>
+        <div class="stat-num"><?= $activeCount ?></div>
         <div class="stat-lbl">Active</div>
       </div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card stat-card-clickable" id="statInactive" onclick="setMatFilter('inactive', this)">
       <div class="stat-icon gray"><i class="bi bi-x-circle-fill"></i></div>
       <div class="stat-body">
-        <div class="stat-num"><?= count(array_filter($materials ?? [], fn($m) => !($m['is_active'] ?? true))) ?></div>
-        <div class="stat-lbl">Inactive</div>
+        <div class="stat-num"><?= $inactiveCount ?></div>
+        <div class="stat-lbl">Inactive / Archived</div>
       </div>
     </div>
   </div>
 
-  <!-- SEARCH -->
-  <div class="adm-search">
-    <input class="adm-input" type="text" id="matSearch" placeholder="Search materials..." oninput="filterTable()" style="max-width:320px;">
+  <!-- SEARCH + FILTER BUTTONS -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:20px;">
+    <input class="adm-input" type="text" id="matSearch" placeholder="Search materials..." oninput="filterTable()" style="max-width:320px; flex:1;">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="mat-filter-btn active" id="btnAll"      onclick="setMatFilter('all', null)"><i class="bi bi-grid-fill"></i> All</button>
+      <button class="mat-filter-btn"        id="btnActive"   onclick="setMatFilter('active', null)"><i class="bi bi-check-circle-fill"></i> Active</button>
+      <button class="mat-filter-btn"        id="btnArchived" onclick="setMatFilter('archived', null)"><i class="bi bi-archive-fill"></i> Archived</button>
+    </div>
   </div>
 
   <!-- TABLE -->
   <div class="adm-card">
     <div class="adm-card-head">
-      <span><i class="bi bi-table me-2"></i>All Materials</span>
+      <span><i class="bi bi-table me-2"></i>All Materials <span id="filterLabel" style="font-size:0.8rem; color:var(--text-secondary); font-weight:600;"></span></span>
     </div>
     <?php if (empty($materials ?? [])): ?>
       <div class="adm-empty">No materials yet. Click "Add Material" to get started.</div>
@@ -72,7 +133,7 @@
       </thead>
       <tbody>
         <?php foreach ($materials ?? [] as $m): ?>
-        <tr>
+        <tr data-status="<?= ($m['is_active'] ?? false) ? 'active' : 'inactive' ?>">
           <td>
             <?php 
             $imageUrl = '';
@@ -96,13 +157,34 @@
           </td>
           <td><strong><?= htmlspecialchars($m['material_name'] ?? '') ?></strong></td>
           <td style="max-width:200px; color:var(--text-secondary); font-size:0.82rem; font-weight:700;">
-            <?= htmlspecialchars(mb_strimwidth($m['description'] ?? '', 0, 60, '…')) ?>
+            <?php
+              $mdesc = $m['description'] ?? '';
+              $mdid  = 'mdesc_' . ($m['material_id'] ?? 0);
+              $mneedsMore = mb_strlen($mdesc) > 60;
+              $mshort = mb_strimwidth($mdesc, 0, 60, '');
+            ?>
+            <?php if ($mneedsMore): ?>
+              <span id="<?= $mdid ?>_s"><?= htmlspecialchars($mshort) ?>…
+                <button onclick="document.getElementById('<?= $mdid ?>_s').style.display='none';document.getElementById('<?= $mdid ?>_f').style.display='inline';"
+                  style="background:none;border:none;color:#FFD700;font-size:0.72rem;font-weight:800;cursor:pointer;padding:0;text-decoration:underline;">
+                  see more
+                </button>
+              </span>
+              <span id="<?= $mdid ?>_f" style="display:none;"><?= htmlspecialchars($mdesc) ?>
+                <button onclick="document.getElementById('<?= $mdid ?>_f').style.display='none';document.getElementById('<?= $mdid ?>_s').style.display='inline';"
+                  style="background:none;border:none;color:#FFD700;font-size:0.72rem;font-weight:800;cursor:pointer;padding:0;text-decoration:underline;">
+                  see less
+                </button>
+              </span>
+            <?php else: ?>
+              <?= htmlspecialchars($mdesc ?: '—') ?>
+            <?php endif; ?>
           </td>
           <td><strong style="color:#22c55e;">₱<?= number_format($m['unit_price'] ?? 0, 2) ?></strong></td>
           <td style="color:var(--text-primary); font-size:0.82rem; font-weight:700;"><?= htmlspecialchars($m['unit_type'] ?? '') ?></td>
           <td style="color:var(--text-primary); font-weight:900; font-size:0.9rem;"><?= number_format($m['stock_quantity'] ?? 0) ?></td>
           <td>
-            <span class="status-badge <?= ($m['is_active'] ?? false) ? 'status-active' : 'status-inactive' ?>">
+            <span class="status-badge <?= ($m['is_active'] ?? false) ? 'status-active' : 'status-archived' ?>">
               <?php if ($m['is_active'] ?? false): ?>
                 <i class="bi bi-check-circle-fill me-1"></i> Active
               <?php else: ?>
@@ -119,19 +201,19 @@
                 <i class="bi bi-pencil-fill"></i>
               </button>
               <?php if ($m['is_active'] ?? false): ?>
-              <a href="?controller=admin&action=archiveMaterial&id=<?= $m['material_id'] ?? 0 ?>"
+              <button type="button"
                  class="adm-btn adm-btn-gray" style="padding:6px 12px; font-size:0.8rem;"
-                 onclick="return confirm('Archive this material? It will be hidden from the shop but not deleted.')"
+                 onclick="openMatConfirm('archive', <?= $m['material_id'] ?? 0 ?>, '<?= htmlspecialchars(addslashes($m['material_name'] ?? ''), ENT_QUOTES) ?>')"
                  title="Archive Material">
-                <i class="bi bi-archive-fill"></i>
-              </a>
+                <i class="bi bi-archive-fill"></i> Archive
+              </button>
               <?php else: ?>
-              <a href="?controller=admin&action=restoreMaterial&id=<?= $m['material_id'] ?? 0 ?>"
+              <button type="button"
                  class="adm-btn adm-btn-green" style="padding:6px 12px; font-size:0.8rem;"
-                 onclick="return confirm('Restore this material to the shop?')"
+                 onclick="openMatConfirm('restore', <?= $m['material_id'] ?? 0 ?>, '<?= htmlspecialchars(addslashes($m['material_name'] ?? ''), ENT_QUOTES) ?>')"
                  title="Restore Material">
-                <i class="bi bi-arrow-counterclockwise"></i>
-              </a>
+                <i class="bi bi-arrow-counterclockwise"></i> Restore
+              </button>
               <?php endif; ?>
             </div>
           </td>
@@ -304,22 +386,6 @@ function toggleImageTab(tab) {
   }
 }
 
-function previewImage(event) {
-  const file = event.target.files[0];
-  const preview = document.getElementById('imagePreview');
-  
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  } else {
-    preview.style.display = 'none';
-  }
-}
-
 function openEditMaterial(materialId) {
   // Find the material data from the table
   const materials = <?= json_encode($materials ?? []) ?>;
@@ -329,9 +395,7 @@ function openEditMaterial(materialId) {
     alert('Material not found!');
     return;
   }
-  
-  console.log('Editing material:', material);
-  
+
   // Set form action
   document.getElementById('editForm').action = '?controller=admin&action=editMaterial&id=' + materialId;
   
@@ -374,55 +438,49 @@ function openEditMaterial(materialId) {
   openModal('editModal');
 }
 
-function openEdit(mat) {
-  console.log('Opening edit for material:', mat); // Debug log
-  
-  // Set form action
-  document.getElementById('editForm').action = '?controller=admin&action=editMaterial&id=' + mat.material_id;
-  
-  // Populate form fields
-  document.getElementById('edit_name').value = mat.material_name || '';
-  document.getElementById('edit_price').value = mat.unit_price || '';
-  document.getElementById('edit_unit').value = mat.unit_type || 'per cubic meter';
-  document.getElementById('edit_stock').value = mat.stock_quantity || 0;
-  document.getElementById('edit_description').value = mat.description || '';
-  document.getElementById('edit_status').value = mat.is_active ? '1' : '0';
-  
-  // Clear image fields
-  document.getElementById('edit_image').value = '';
-  document.getElementById('edit_image_url').value = mat.image && mat.image.startsWith('http') ? mat.image : '';
-  
-  // Show current image if exists
-  const currentImageDiv = document.getElementById('currentImageDiv');
-  if (currentImageDiv) {
-    currentImageDiv.remove();
-  }
-  
-  if (mat.image) {
-    const imageUrl = mat.image.startsWith('http') ? mat.image : '/app/public/assets/imgs/materials/' + mat.image;
-    const imageDiv = document.createElement('div');
-    imageDiv.id = 'currentImageDiv';
-    imageDiv.innerHTML = `
-      <div style="margin-bottom: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-        <label style="color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; display: block;">Current Image:</label>
-        <img src="${imageUrl}" alt="Current image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px solid #FFD700;">
-      </div>
-    `;
-    document.getElementById('edit_uploadTab').insertBefore(imageDiv, document.getElementById('edit_uploadTab').firstChild);
-  }
-  
-  // Reset to upload tab
-  toggleImageTab('edit_upload');
-  
-  // Open modal
-  openModal('editModal');
-}
-
 function filterTable() {
   const q = document.getElementById('matSearch').value.toLowerCase();
   document.querySelectorAll('#matTable tbody tr').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    const matchesSearch = row.textContent.toLowerCase().includes(q);
+    const status = row.dataset.status;
+    const matchesFilter = (currentFilter === 'all') ||
+                          (currentFilter === 'active'   && status === 'active') ||
+                          (currentFilter === 'inactive' && status === 'inactive') ||
+                          (currentFilter === 'archived' && status === 'inactive');
+    row.style.display = (matchesSearch && matchesFilter) ? '' : 'none';
   });
+}
+
+let currentFilter = 'all';
+
+function setMatFilter(filter, clickedCard) {
+  currentFilter = filter;
+
+  // Update stat card highlights
+  ['statAll','statActive','statInactive'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('filter-active-card');
+  });
+  if (filter === 'all'      && document.getElementById('statAll'))      document.getElementById('statAll').classList.add('filter-active-card');
+  if (filter === 'active'   && document.getElementById('statActive'))   document.getElementById('statActive').classList.add('filter-active-card');
+  if ((filter === 'inactive' || filter === 'archived') && document.getElementById('statInactive')) document.getElementById('statInactive').classList.add('filter-active-card');
+
+  // Update filter buttons
+  ['btnAll','btnActive','btnArchived'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const btnMap = { all: 'btnAll', active: 'btnActive', inactive: 'btnArchived', archived: 'btnArchived' };
+  if (btnMap[filter] && document.getElementById(btnMap[filter])) {
+    document.getElementById(btnMap[filter]).classList.add('active');
+  }
+
+  // Update card header label
+  const labels = { all: '', active: '— Active', inactive: '— Inactive', archived: '— Archived' };
+  const labelEl = document.getElementById('filterLabel');
+  if (labelEl) labelEl.textContent = labels[filter] || '';
+
+  filterTable();
 }
 
 // Close modal on overlay click
@@ -435,6 +493,66 @@ document.querySelectorAll('.adm-modal-overlay').forEach(overlay => {
 <?php if (isset($editMaterial)): ?>
 openEdit(<?= json_encode($editMaterial) ?>);
 <?php endif; ?>
+</script>
+
+<!-- Material Action Confirmation Modal -->
+<div class="sys-modal-overlay" id="matConfirmOverlay">
+  <div class="sys-modal">
+    <div class="sys-modal-icon" id="matConfirmIcon"><i class="bi bi-archive-fill"></i></div>
+    <div class="sys-modal-title" id="matConfirmTitle">Archive Material</div>
+    <div class="sys-modal-msg" id="matConfirmMsg">Are you sure?</div>
+    <div class="sys-modal-btns">
+      <button class="sys-btn-cancel" onclick="closeMatConfirm()">Cancel</button>
+      <a id="matConfirmBtn" href="#" class="sys-btn-gray">Confirm</a>
+    </div>
+  </div>
+</div>
+
+<!-- sys-modal styles loaded via admin_style.css.php -->
+
+<script>
+let matConfirmUrl = '';
+
+function openMatConfirm(type, id, name) {
+  const overlay = document.getElementById('matConfirmOverlay');
+  const icon    = document.getElementById('matConfirmIcon');
+  const title   = document.getElementById('matConfirmTitle');
+  const msg     = document.getElementById('matConfirmMsg');
+  const btn     = document.getElementById('matConfirmBtn');
+
+  if (type === 'archive') {
+    matConfirmUrl = `?controller=admin&action=archiveMaterial&id=${id}`;
+    icon.className = 'sys-modal-icon gray';
+    icon.innerHTML = '<i class="bi bi-archive-fill"></i>';
+    title.textContent = 'Archive Material';
+    msg.innerHTML = `Archive <strong>${name}</strong>? It will be hidden from the shop but not deleted.`;
+    btn.className = 'sys-btn-gray';
+    btn.innerHTML = '<i class="bi bi-archive-fill"></i> Archive';
+  } else {
+    matConfirmUrl = `?controller=admin&action=restoreMaterial&id=${id}`;
+    icon.className = 'sys-modal-icon green';
+    icon.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i>';
+    title.textContent = 'Restore Material';
+    msg.innerHTML = `Restore <strong>${name}</strong> back to the shop?`;
+    btn.className = 'sys-btn-green';
+    btn.innerHTML = '<i class="bi bi-arrow-counterclockwise"></i> Restore';
+  }
+
+  btn.href = matConfirmUrl;
+  overlay.classList.add('open');
+}
+
+function closeMatConfirm() {
+  document.getElementById('matConfirmOverlay').classList.remove('open');
+}
+
+document.getElementById('matConfirmOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeMatConfirm();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeMatConfirm();
+});
 </script>
 
 <?php

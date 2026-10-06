@@ -41,6 +41,82 @@ class Security
         return htmlspecialchars(trim(strip_tags($input)), ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Strip emojis and non-printable/non-standard Unicode characters.
+     * Allows: letters (all scripts), digits, spaces, and common punctuation.
+     * Blocks: emoji, emoticons, symbols, control characters.
+     */
+    public static function stripEmoji(string $input): string
+    {
+        // Remove emoji and symbol Unicode ranges
+        $cleaned = preg_replace('/[\x{1F000}-\x{1FFFF}]/u', '', $input); // Misc symbols, emoji
+        $cleaned = preg_replace('/[\x{2600}-\x{27BF}]/u', '', $cleaned); // Misc symbols & dingbats
+        $cleaned = preg_replace('/[\x{FE00}-\x{FEFF}]/u', '', $cleaned); // Variation selectors, BOM
+        $cleaned = preg_replace('/[\x{1F300}-\x{1F9FF}]/u', '', $cleaned); // More emoji blocks
+        $cleaned = preg_replace('/[\x{200B}-\x{200F}]/u', '', $cleaned); // Zero-width chars
+        $cleaned = preg_replace('/[\x{00}-\x{08}\x{0B}\x{0C}\x{0E}-\x{1F}\x{7F}]/u', '', $cleaned); // Control chars
+        return trim((string)$cleaned);
+    }
+
+    /**
+     * Validate a name field — allows letters (including accented/unicode),
+     * spaces, hyphens, apostrophes, and periods. Blocks everything else.
+     */
+    public static function validateName(string $input): bool
+    {
+        $stripped = self::stripEmoji($input);
+        // Allow unicode letters, spaces, hyphens, apostrophes, periods
+        return (bool) preg_match('/^[\p{L}\p{M}\s\'\-\.]+$/u', $stripped);
+    }
+
+    /**
+     * Validate a Philippine mobile number.
+     * Accepts formats:
+     *   09XXXXXXXXX       (11 digits, local)
+     *   639XXXXXXXXX      (12 digits, no +)
+     *   +639XXXXXXXXX     (13 chars with +)
+     *   0917 123 4567     (with spaces)
+     * Always normalizes to +639XXXXXXXXX for storage.
+     * Returns the normalized number or false if invalid.
+     */
+    public static function validatePHPhone(string $input): string|false
+    {
+        // Strip spaces and dashes for normalization
+        $clean = preg_replace('/[\s\-]/', '', $input);
+
+        // Match patterns and normalize
+        if (preg_match('/^\+63(9\d{9})$/', $clean, $m)) {
+            return '+63' . $m[1];
+        }
+        if (preg_match('/^63(9\d{9})$/', $clean, $m)) {
+            return '+63' . $m[1];
+        }
+        if (preg_match('/^0(9\d{9})$/', $clean, $m)) {
+            return '+63' . $m[1];
+        }
+
+        return false;
+    }
+
+    /**
+     * Validate a phone/contact number — digits, spaces, +, -, (, ) only.
+     * @deprecated Use validatePHPhone() for Philippine numbers.
+     */
+    public static function validatePhone(string $input): bool
+    {
+        return (bool) preg_match('/^[\d\s\+\-\(\)]{7,20}$/', $input);
+    }
+
+    /**
+     * Validate an address — allows letters, digits, spaces, and common
+     * address punctuation: , . # - / ( )
+     */
+    public static function validateAddress(string $input): bool
+    {
+        $stripped = self::stripEmoji($input);
+        return (bool) preg_match('/^[\p{L}\p{M}\p{N}\s\,\.\#\-\/\(\)]+$/u', $stripped);
+    }
+
     public static function validateEmail(string $email): bool
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;

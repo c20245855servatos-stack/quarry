@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../models/Registration.php';
 require_once __DIR__ . '/../core/Flash.php';
 require_once __DIR__ . '/../core/Csrf.php';
+require_once __DIR__ . '/../core/Security.php';
 
 class RegistrationController
 {
@@ -32,24 +33,45 @@ class RegistrationController
             redirect('registration', 'create');
         }
 
-        $full_name      = trim((string)($_POST['full_name']        ?? ''));
-        $contact_number = trim((string)($_POST['contact_number']   ?? ''));
-        $email          = trim((string)($_POST['email']            ?? ''));
-        $address        = trim((string)($_POST['address']          ?? ''));
-        $password       =              ($_POST['password']         ?? '');
-        $confirm        =              ($_POST['password_confirm']  ?? '');
+        $full_name      = Security::stripEmoji(trim((string)($_POST['full_name']       ?? '')));
+        $contact_number_raw = trim((string)($_POST['contact_number'] ?? ''));
+        $email          = trim((string)($_POST['email']           ?? ''));
+        $address        = Security::stripEmoji(trim((string)($_POST['address']         ?? '')));
+        $password       =              ($_POST['password']        ?? '');
+        $confirm        =              ($_POST['password_confirm'] ?? '');
 
         $hasError = false;
+        $contact_number = '';
+
+        // Normalize and validate PH phone number
+        if ($contact_number_raw !== '') {
+            $normalized = Security::validatePHPhone($contact_number_raw);
+            if ($normalized === false) {
+                Flash::set('error', 'Invalid contact number. Please enter a valid Philippine mobile number (e.g. 09171234567 or +639171234567).');
+                $hasError = true;
+            } else {
+                $contact_number = $normalized;
+            }
+        } else {
+            Flash::set('error', 'Contact number is required.');
+            $hasError = true;
+        }
 
         if ($full_name === '') {
             Flash::set('error', 'Full name is required.');
+            $hasError = true;
+        } elseif (!Security::validateName($full_name)) {
+            Flash::set('error', 'Full name contains invalid characters. Only letters, spaces, hyphens, and apostrophes are allowed.');
             $hasError = true;
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Flash::set('error', 'A valid email address is required.');
             $hasError = true;
         }
-        if (strlen($password) < 6) {
+        if ($address !== '' && !Security::validateAddress($address)) {
+            Flash::set('error', 'Address contains invalid characters. Only letters, digits, spaces, and common punctuation (,.#-/()) are allowed.');
+            $hasError = true;
+        }        if (strlen($password) < 6) {
             Flash::set('error', 'Password must be at least 6 characters.');
             $hasError = true;
         }

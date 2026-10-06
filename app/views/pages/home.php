@@ -1170,7 +1170,6 @@ html, body {
                     <h3 class="service-title">Quarry Extraction</h3>
                     <p class="service-description">Professionala stone, sand, and gravel extraction using modern equipment and sustainable mining practices for premium quality materials.</p>
                 </div>
-                <a href="?controller=materials&action=index" class="service-link">Learn More →</a>
             </div>
         </div>
         
@@ -1181,7 +1180,6 @@ html, body {
                     <h3 class="service-title">Material Processing</h3>
                     <p class="service-description">Advanced crushing, screening, and washing facilities to produce construction-grade materials that meet industry specifications.</p>
                 </div>
-                <a href="?controller=materials&action=index" class="service-link">Learn More →</a>
             </div>
         </div>
         
@@ -1192,7 +1190,6 @@ html, body {
                     <h3 class="service-title">Bulk Supply & Delivery</h3>
                     <p class="service-description">Reliable bulk material supply with efficient logistics and on-time delivery to construction sites and hardware stores.</p>
                 </div>
-                <a href="?controller=materials&action=index" class="service-link">Learn More →</a>
             </div>
         </div>
     </div>

@@ -5,412 +5,318 @@ $user = $_SESSION['user'] ?? null;
 <?php require __DIR__ . '/admin_style.css.php'; ?>
 
 <style>
-/* Enhanced Readability Styles for Admin Settings */
-.settings-container {
-  max-width: 800px;
+.settings-wrap {
+  max-width: 700px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 16px 40px;
 }
 
-.settings-header {
+/* ── Page Header ── */
+.settings-page-header {
   text-align: center;
-  margin-bottom: 40px;
-  padding: 30px 0;
-  border-bottom: 3px solid rgba(255, 215, 0, 0.3);
+  margin-bottom: 32px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-
-.settings-title {
-  font-size: 2.5rem;
+.settings-page-header h1 {
+  font-size: 1.55rem;
   font-weight: 900;
-  color: #FFD700;
-  margin-bottom: 12px;
+  color: #fff;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 1.5px;
+  margin: 0 0 7px;
 }
-
-.settings-subtitle {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
+.settings-page-header p {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
   font-weight: 600;
-  line-height: 1.6;
 }
 
-.profile-section {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-  border: 2px solid rgba(255, 215, 0, 0.3);
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+/* ── Cards ── */
+.s-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 16px;
 }
-
-.profile-info {
+.s-card-head {
+  padding: 15px 22px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
   display: flex;
   align-items: center;
-  gap: 24px;
-  margin-bottom: 40px;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
+.s-card-head i { color: #FFD700; font-size: 0.95rem; }
+.s-card-body { padding: 22px; }
 
+/* ── Profile row ── */
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 .profile-avatar {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: linear-gradient(135deg, #FFD700, #FFB000);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: #1a1a1a;
-  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-  flex-shrink: 0;
-}
-
-.profile-details h3 {
   font-size: 1.6rem;
   font-weight: 900;
-  color: #FFD700;
-  margin: 0 0 8px 0;
-  letter-spacing: 1px;
+  color: #1a1a1a;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(255,215,0,0.3);
 }
-
-.profile-details .email {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.9);
+.profile-meta { flex: 1; min-width: 0; }
+.profile-meta .name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.profile-meta .email {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.55);
   font-weight: 600;
-  margin-bottom: 6px;
+  margin: 0 0 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
-.profile-details .role {
-  font-size: 1rem;
-  color: #FFD700;
-  font-weight: 700;
-  display: flex;
+.role-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-
-.password-section {
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 40px;
-}
-
-.section-title {
-  font-size: 1.4rem;
-  font-weight: 900;
+  gap: 5px;
+  background: rgba(255,215,0,0.12);
+  border: 1px solid rgba(255,215,0,0.3);
   color: #FFD700;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.form-grid {
-  display: grid;
-  gap: 24px;
-  margin-bottom: 32px;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 11px;
+  border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.form-input {
-  padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
+/* ── Form fields ── */
+.s-form-group { margin-bottom: 18px; }
+.s-form-group:last-of-type { margin-bottom: 0; }
+.s-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 7px;
 }
-
-.form-input:focus {
+.s-input {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 7px;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.s-input:focus {
   outline: none;
   border-color: #FFD700;
-  background: rgba(0, 0, 0, 0.4);
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 0 3px rgba(255,215,0,0.12);
+  background: rgba(0,0,0,0.4);
 }
+.s-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 500; }
 
-.form-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 500;
-}
-
-.security-notice {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
-  border: 2px solid rgba(255, 215, 0, 0.4);
-  border-radius: 12px;
-  padding: 20px 24px;
-  margin-bottom: 32px;
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.95);
-  font-weight: 600;
-  line-height: 1.6;
+/* ── Security hint ── */
+.s-hint {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 9px;
+  background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
+  border-radius: 7px;
+  padding: 12px 15px;
+  margin: 18px 0 18px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 600;
+  line-height: 1.5;
 }
+.s-hint i { color: #FFD700; font-size: 0.9rem; margin-top: 1px; flex-shrink: 0; }
 
-.security-notice i {
-  color: #FFD700;
-  font-size: 1.3rem;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.submit-button {
+/* ── Submit button ── */
+.s-submit {
   width: 100%;
-  padding: 18px 24px;
+  padding: 13px 18px;
   background: linear-gradient(135deg, #FFD700, #FFB000);
   border: none;
-  border-radius: 12px;
+  border-radius: 7px;
   color: #1a1a1a;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  transition: all 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  box-shadow: 0 3px 12px rgba(255,215,0,0.25);
 }
-
-.submit-button:hover {
+.s-submit:hover {
   background: linear-gradient(135deg, #FFB000, #FF8C00);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(255,215,0,0.35);
 }
+.s-submit:active { transform: translateY(0); }
 
-.security-info {
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 32px;
-}
-
-.info-grid {
-  display: grid;
-  gap: 20px;
-}
-
-.info-item {
+/* ── Security info items ── */
+.s-info-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border-radius: 12px;
-  border-left: 4px solid;
-  transition: all 0.3s ease;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 7px;
+  border-left: 3px solid;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
 }
-
-.info-item:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.info-item.success {
-  background: rgba(34, 197, 94, 0.1);
-  border-left-color: #22c55e;
-}
-
-.info-item.info {
-  background: rgba(59, 130, 246, 0.1);
-  border-left-color: #3b82f6;
-}
-
-.info-item.warning {
-  background: rgba(255, 215, 0, 0.1);
-  border-left-color: #FFD700;
-}
-
-.info-icon {
-  font-size: 1.4rem;
-  flex-shrink: 0;
-}
-
-.info-content h4 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 4px 0;
+.s-info-item:last-child { margin-bottom: 0; }
+.s-info-item:hover { transform: translateX(3px); }
+.s-info-item.green  { background: rgba(34,197,94,0.07);  border-left-color: #22c55e; }
+.s-info-item.blue   { background: rgba(59,130,246,0.07); border-left-color: #3b82f6; }
+.s-info-item.yellow { background: rgba(255,215,0,0.07);  border-left-color: #FFD700; }
+.s-info-item .s-info-icon { font-size: 1.1rem; flex-shrink: 0; }
+.s-info-item.green  .s-info-icon { color: #22c55e; }
+.s-info-item.blue   .s-info-icon { color: #3b82f6; }
+.s-info-item.yellow .s-info-icon { color: #FFD700; }
+.s-info-title {
+  font-size: 0.78rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin: 0 0 3px;
 }
-
-.info-content p {
-  font-size: 0.9rem;
+.s-info-item.green  .s-info-title { color: #22c55e; }
+.s-info-item.blue   .s-info-title { color: #3b82f6; }
+.s-info-item.yellow .s-info-title { color: #FFD700; }
+.s-info-desc {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
   margin: 0;
-  opacity: 0.8;
+  font-weight: 600;
   line-height: 1.4;
-}
-
-.success .info-icon { color: #22c55e; }
-.success h4 { color: #22c55e; }
-
-.info .info-icon { color: #3b82f6; }
-.info h4 { color: #3b82f6; }
-
-.warning .info-icon { color: #FFD700; }
-.warning h4 { color: #FFD700; }
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .settings-container {
-    padding: 0 16px;
-  }
-  
-  .settings-title {
-    font-size: 2rem;
-  }
-  
-  .profile-info {
-    flex-direction: column;
-    text-align: center;
-    gap: 16px;
-  }
-  
-  .profile-avatar {
-    width: 70px;
-    height: 70px;
-    font-size: 2rem;
-  }
-  
-  .profile-section,
-  .password-section,
-  .security-info {
-    padding: 24px 20px;
-  }
 }
 </style>
 
 <div class="adm-wrap">
-  <div class="settings-container">
-    
-    <!-- HEADER -->
-    <div class="settings-header">
-      <h1 class="settings-title">
-        <i class="bi bi-gear-fill"></i> Admin Settings
-      </h1>
-      <p class="settings-subtitle">
-        Manage your administrator account settings and security preferences
-      </p>
+  <div class="settings-wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="settings-page-header">
+      <h1><i class="bi bi-gear-fill me-2" style="color:#FFD700;"></i>Admin Settings</h1>
+      <p>Manage your account and security preferences</p>
     </div>
 
-    <!-- ADMIN PROFILE SECTION -->
-    <div class="profile-section">
-      <div class="profile-info">
-        <div class="profile-avatar">
-          <?= strtoupper(substr($user['name'] ?? 'A', 0, 1)) ?>
-        </div>
-        <div class="profile-details">
-          <h3><?= htmlspecialchars($user['name'] ?? '') ?></h3>
-          <div class="email"><?= htmlspecialchars($user['email'] ?? '') ?></div>
-          <div class="role">
-            <i class="bi bi-shield-fill-check"></i>
-            Administrator
+    <!-- PROFILE CARD -->
+    <div class="s-card">
+      <div class="s-card-head">
+        <i class="bi bi-person-fill"></i> Account
+      </div>
+      <div class="s-card-body">
+        <div class="profile-row">
+          <div class="profile-avatar">
+            <?= strtoupper(substr($user['name'] ?? 'A', 0, 1)) ?>
+          </div>
+          <div class="profile-meta">
+            <div class="name"><?= htmlspecialchars($user['name'] ?? 'Admin') ?></div>
+            <div class="email"><?= htmlspecialchars($user['email'] ?? '') ?></div>
+            <span class="role-badge"><i class="bi bi-shield-fill-check"></i> Administrator</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- PASSWORD CHANGE FORM -->
-      <div class="password-section">
-        <h2 class="section-title">
-          <i class="bi bi-shield-lock"></i>
-          Change Password
-        </h2>
-
+    <!-- CHANGE PASSWORD CARD -->
+    <div class="s-card">
+      <div class="s-card-head">
+        <i class="bi bi-shield-lock-fill"></i> Change Password
+      </div>
+      <div class="s-card-body">
         <form method="POST" action="?controller=admin&action=changePassword">
           <input type="hidden" name="_csrf" value="<?= Csrf::generate() ?>">
-          <div class="form-grid">
-            <div class="form-field">
-              <label class="form-label">Current Password</label>
-              <input type="password" name="current_password" class="form-input" 
-                     placeholder="Enter your current password" required>
-            </div>
 
-            <div class="form-field">
-              <label class="form-label">New Password</label>
-              <input type="password" name="new_password" class="form-input" 
-                     placeholder="Enter new password (minimum 6 characters)" required minlength="6">
-            </div>
-
-            <div class="form-field">
-              <label class="form-label">Confirm New Password</label>
-              <input type="password" name="confirm_password" class="form-input" 
-                     placeholder="Confirm your new password" required>
-            </div>
+          <div class="s-form-group">
+            <label class="s-label">Current Password</label>
+            <input type="password" name="current_password" class="s-input"
+                   placeholder="Enter your current password" required autocomplete="current-password">
           </div>
 
-          <div class="security-notice">
-            <i class="bi bi-info-circle"></i>
-            <div>
-              <strong>Security Requirements:</strong> Your password must be at least 6 characters long. 
-              As an administrator, we recommend using a strong, unique password to protect the system 
-              and maintain security standards.
-            </div>
+          <div class="s-form-group">
+            <label class="s-label">New Password</label>
+            <input type="password" name="new_password" class="s-input"
+                   placeholder="Minimum 6 characters" required minlength="6" autocomplete="new-password">
           </div>
 
-          <button type="submit" class="submit-button">
-            <i class="bi bi-key"></i>
-            Update Password
+          <div class="s-form-group">
+            <label class="s-label">Confirm New Password</label>
+            <input type="password" name="confirm_password" class="s-input"
+                   placeholder="Re-enter new password" required autocomplete="new-password">
+          </div>
+
+          <div class="s-hint">
+            <i class="bi bi-info-circle-fill"></i>
+            Use at least 6 characters. A strong password includes uppercase letters, numbers, and symbols.
+          </div>
+
+          <button type="submit" class="s-submit">
+            <i class="bi bi-key-fill"></i> Update Password
           </button>
         </form>
       </div>
     </div>
 
-    <!-- SECURITY INFORMATION -->
-    <div class="security-info">
-      <h2 class="section-title">
-        <i class="bi bi-shield-check"></i>
-        Security Information
-      </h2>
-      
-      <div class="info-grid">
-        <div class="info-item success">
-          <i class="bi bi-check-circle-fill info-icon"></i>
-          <div class="info-content">
-            <h4>Administrator Access</h4>
-            <p>You have full system access and administrative privileges</p>
+    <!-- SECURITY INFO CARD -->
+    <div class="s-card">
+      <div class="s-card-head">
+        <i class="bi bi-shield-check"></i> Security Info
+      </div>
+      <div class="s-card-body">
+        <div class="s-info-item green">
+          <i class="bi bi-check-circle-fill s-info-icon"></i>
+          <div>
+            <div class="s-info-title">Full Access</div>
+            <div class="s-info-desc">Administrator with complete system privileges</div>
           </div>
         </div>
-        
-        <div class="info-item info">
-          <i class="bi bi-person-badge-fill info-icon"></i>
-          <div class="info-content">
-            <h4>Account Type</h4>
-            <p>Administrator with complete system management capabilities</p>
+        <div class="s-info-item blue">
+          <i class="bi bi-person-badge-fill s-info-icon"></i>
+          <div>
+            <div class="s-info-title">Account Type</div>
+            <div class="s-info-desc">System administrator — all modules accessible</div>
           </div>
         </div>
-        
-        <div class="info-item warning">
-          <i class="bi bi-clock-fill info-icon"></i>
-          <div class="info-content">
-            <h4>Current Session</h4>
-            <p>Active since <?= date('M d, Y \a\t g:i A') ?></p>
+        <div class="s-info-item yellow">
+          <i class="bi bi-clock-fill s-info-icon"></i>
+          <div>
+            <div class="s-info-title">Session Started</div>
+            <div class="s-info-desc"><?= date('M d, Y \a\t g:i A') ?></div>
           </div>
         </div>
       </div>
@@ -418,6 +324,26 @@ $user = $_SESSION['user'] ?? null;
 
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const EMOJI_RE = /[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{1F300}-\u{1F9FF}\u{FE00}-\u{FEFF}\u{200B}-\u{200F}]/gu;
+    function stripEmoji(el) {
+        const pos = el.selectionStart;
+        const before = el.value;
+        const after = before.replace(EMOJI_RE, '');
+        if (before !== after) {
+            el.value = after;
+            const diff = before.length - after.length;
+            try { el.setSelectionRange(Math.max(0, pos - diff), Math.max(0, pos - diff)); } catch(e) {}
+        }
+    }
+    document.querySelectorAll('input[type="password"], input[type="text"]:not([readonly])').forEach(el => {
+        el.addEventListener('input', () => stripEmoji(el));
+        el.addEventListener('paste', () => setTimeout(() => stripEmoji(el), 0));
+    });
+});
+</script>
 
 <?php
 $content = ob_get_clean();

@@ -45,12 +45,12 @@
         <div class="stat-lbl">Pending Orders</div>
       </div>
     </a>
-    <a href="?controller=admin&action=sales" class="stat-card" style="text-decoration:none; cursor:pointer;">
-      <div class="stat-icon teal" style="font-size:1.4rem; font-weight:900;">₱</div>
+    <a href="?controller=admin&action=sales" class="stat-card" style="text-decoration:none; cursor:pointer; position:relative; overflow:hidden; border-top: 3px solid #FFD700 !important;">
       <div class="stat-body">
-        <div class="stat-num">₱<?= number_format($stats['revenue'], 0) ?></div>
+        <div class="stat-num" style="color:#FFD700;">₱<?= number_format($stats['revenue'], 0) ?></div>
         <div class="stat-lbl">Revenue (This Month)</div>
       </div>
+      <i class="bi bi-graph-up-arrow" style="position:absolute; bottom:10px; right:14px; font-size:2rem; color:rgba(255,215,0,0.08);"></i>
     </a>
   </div>
 

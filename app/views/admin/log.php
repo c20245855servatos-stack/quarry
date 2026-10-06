@@ -110,10 +110,7 @@
     </div>
   </div>
 
-  <!-- SEARCH + FILTER -->
-  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:20px;">
-    <input class="adm-input" type="text" id="logSearch" placeholder="Search logs..." oninput="applyFilters()" style="max-width:280px; flex:1;">
-  </div>
+  <!-- FILTER -->
 
   <!-- FILTER BUTTONS -->
   <?php $activeFilter = $_GET['filter'] ?? ''; ?>
@@ -147,9 +144,9 @@
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.15);
     color: rgba(255,255,255,0.75);
-    padding: 6px 14px;
+    padding: 9px 18px;
     border-radius: 20px;
-    font-size: 0.78rem;
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
     transition: 0.2s ease;
@@ -197,8 +194,27 @@
         <tr class="log-row" data-action="<?= htmlspecialchars($l['action'] ?? '') ?>">
           <td style="color:var(--text-primary); font-weight:700;"><?= $seq ?></td>
           <td>
-            <span style="display:inline-block; padding:4px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; background:#22c55e; border:1px solid #16a34a; color:#fff; white-space:nowrap;">
-              <?= htmlspecialchars($l['action'] ?? 'Unknown') ?>
+            <?php
+              $action = $l['action'] ?? 'Unknown';
+              $badgeStyle = match(true) {
+                str_contains($action, 'Order Placed')       => 'background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;',
+                str_contains($action, 'Order Updated')      => 'background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.4);color:#a78bfa;',
+                str_contains($action, 'Order Cancelled')    => 'background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;',
+                str_contains($action, 'Delivery Confirmed') => 'background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:#4ade80;',
+                str_contains($action, 'Stock Replenished')  => 'background:rgba(20,184,166,0.15);border:1px solid rgba(20,184,166,0.4);color:#2dd4bf;',
+                str_contains($action, 'Material Added')     => 'background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:#4ade80;',
+                str_contains($action, 'Material Updated')   => 'background:rgba(234,179,8,0.15);border:1px solid rgba(234,179,8,0.4);color:#facc15;',
+                str_contains($action, 'Material Deleted')   => 'background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;',
+                str_contains($action, 'Material Archived')  => 'background:rgba(107,114,128,0.15);border:1px solid rgba(107,114,128,0.4);color:#9ca3af;',
+                str_contains($action, 'Material Restored')  => 'background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.4);color:#4ade80;',
+                str_contains($action, 'Item Added to Cart') => 'background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.4);color:#fb923c;',
+                str_contains($action, 'User Deleted')       => 'background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);color:#f87171;',
+                str_contains($action, 'Login')              => 'background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;',
+                default                                     => 'background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7);',
+              };
+            ?>
+            <span style="display:inline-block; padding:3px 9px; border-radius:5px; font-size:0.72rem; font-weight:700; white-space:nowrap; <?= $badgeStyle ?>">
+              <?= htmlspecialchars($action) ?>
             </span>
           </td>
           <td style="color:var(--text-secondary); font-size:0.82rem; font-weight:600; word-break:break-word;">

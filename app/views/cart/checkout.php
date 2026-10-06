@@ -511,8 +511,8 @@
             </div>
             
             <?php 
-            $vat = $subtotal * 0.12;
-            $total = $subtotal + $vat;
+            $delivery_fee = 500.00;
+            $total = $subtotal + $delivery_fee;
             ?>
             <div class="summary-totals">
                 <div class="summary-row">
@@ -520,8 +520,8 @@
                     <span>₱<?= number_format($subtotal, 2) ?></span>
                 </div>
                 <div class="summary-row">
-                    <span>VAT (12%):</span>
-                    <span>₱<?= number_format($vat, 2) ?></span>
+                    <span>Delivery Fee:</span>
+                    <span>₱<?= number_format($delivery_fee, 2) ?></span>
                 </div>
                 <div class="summary-divider">
                     <div class="summary-total">
@@ -567,7 +567,7 @@
             </div>
 
             <?php
-            // Calculate estimated arrival: 6-8 business days from today, skipping Sundays
+            // Calculate estimated arrival: 3-8 business days from today, skipping Sundays
             function getEstimatedArrival(int $minDays, int $maxDays): array {
                 $dates = [];
                 foreach ([$minDays, $maxDays] as $days) {
@@ -584,7 +584,7 @@
                 }
                 return $dates;
             }
-            [$arrivalStart, $arrivalEnd] = getEstimatedArrival(6, 8);
+            [$arrivalStart, $arrivalEnd] = getEstimatedArrival(3, 8);
             $sameMonth = $arrivalStart->format('M') === $arrivalEnd->format('M');
             $arrivalLabel = $sameMonth
                 ? $arrivalStart->format('M') . ' ' . $arrivalStart->format('d') . '–' . $arrivalEnd->format('d') . ', ' . $arrivalEnd->format('Y')
@@ -626,10 +626,10 @@
                 </button>
             </form>
             
-            <a href="?controller=cart&action=index" class="btn-edit-cart">
+            <button type="button" class="btn-edit-cart" onclick="openEditQtyModal()">
                 <i class="bi bi-pencil"></i>
-                Edit Cart
-            </a>
+                Edit
+            </button>
             
             <div class="security-badge">
                 <i class="bi bi-shield-check"></i>
@@ -642,6 +642,124 @@
     <?php endif; ?>
 
 </div>
+
+<!-- ── Edit Cart Quantities Modal ── -->
+<style>
+#editQtyModal input[type=number]::-webkit-outer-spin-button,
+#editQtyModal input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#editQtyModal input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+</style>
+<div class="sys-modal-overlay" id="editQtyModal" style="max-width:none;">
+  <div class="sys-modal" style="max-width:480px; text-align:left; padding:24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+      <div style="font-size:1.1rem; font-weight:900; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">
+        <i class="bi bi-pencil-fill me-2" style="color:#FFD700;"></i>Edit Quantities
+      </div>
+      <button onclick="closeEditQtyModal()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.2rem;cursor:pointer;padding:4px;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div id="editQtyItems" style="margin-bottom:20px;"></div>
+
+    <div class="sys-modal-btns">
+      <button class="sys-btn-cancel" onclick="closeEditQtyModal()">Cancel</button>
+      <button class="sys-btn-yellow" onclick="saveQtyChanges()">
+        <i class="bi bi-check-lg"></i> Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const checkoutCart = <?= json_encode(array_values($cart)) ?>;
+
+function openEditQtyModal() {
+    const container = document.getElementById('editQtyItems');
+    container.innerHTML = '';
+
+    checkoutCart.forEach((item, idx) => {
+        const id = item.id ?? item.material_id;
+        const name = item.name ?? item.material_name ?? '';
+        const qty = item.qty ?? 1;
+        const price = parseFloat(item.price ?? 0);
+
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.07);';
+        row.innerHTML = `
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:0.88rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+                <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);font-weight:600;">₱${price.toFixed(2)} each</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <button onclick="adjustQty(${idx},-1)" style="width:30px;height:30px;border-radius:50%;background:#FFD700;border:none;color:#1a1a1a;font-size:1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;">−</button>
+                <input type="number" id="qty_${idx}" value="${qty}" min="1" max="999"
+                       style="width:52px;text-align:center;background:rgba(255,255,255,0.08);border:1px solid rgba(255,215,0,0.3);border-radius:6px;color:#fff;font-size:0.95rem;font-weight:700;padding:4px;outline:none;-webkit-appearance:none;-moz-appearance:textfield;appearance:textfield;"
+                       oninput="updateRowTotal(${idx},${price})">
+                <button onclick="adjustQty(${idx},1)" style="width:30px;height:30px;border-radius:50%;background:#FFD700;border:none;color:#1a1a1a;font-size:1rem;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;">+</button>
+            </div>
+            <div id="rowtotal_${idx}" style="width:80px;text-align:right;font-weight:800;font-size:0.88rem;color:#FFD700;flex-shrink:0;">
+                ₱${(price * qty).toLocaleString('en-US',{minimumFractionDigits:2})}
+            </div>
+        `;
+        container.appendChild(row);
+    });
+
+    document.getElementById('editQtyModal').classList.add('open');
+}
+
+function adjustQty(idx, delta) {
+    const input = document.getElementById('qty_' + idx);
+    const newVal = Math.max(1, (parseInt(input.value) || 1) + delta);
+    input.value = newVal;
+    updateRowTotal(idx, parseFloat(checkoutCart[idx].price ?? 0));
+}
+
+function updateRowTotal(idx, price) {
+    const qty = Math.max(1, parseInt(document.getElementById('qty_' + idx).value) || 1);
+    document.getElementById('rowtotal_' + idx).textContent =
+        '₱' + (price * qty).toLocaleString('en-US', {minimumFractionDigits:2});
+}
+
+function closeEditQtyModal() {
+    document.getElementById('editQtyModal').classList.remove('open');
+}
+
+function saveQtyChanges() {
+    // Build a form that posts all qty updates
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '?controller=cart&action=updateQtyBulk';
+
+    const csrf = document.createElement('input');
+    csrf.type = 'hidden'; csrf.name = '_csrf';
+    csrf.value = '<?= Csrf::generate() ?>';
+    form.appendChild(csrf);
+
+    checkoutCart.forEach((item, idx) => {
+        const id = item.id ?? item.material_id;
+        const qty = Math.max(1, parseInt(document.getElementById('qty_' + idx).value) || 1);
+
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden'; idInput.name = 'ids[]'; idInput.value = id;
+        form.appendChild(idInput);
+
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'hidden'; qtyInput.name = 'qtys[]'; qtyInput.value = qty;
+        form.appendChild(qtyInput);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+document.getElementById('editQtyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditQtyModal();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeEditQtyModal();
+});
+</script>
 
 <?php
 $content = ob_get_clean();

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../core/Flash.php';
 require_once __DIR__ . '/../core/Csrf.php';
+require_once __DIR__ . '/../core/Security.php';
 
 class UserController
 {
@@ -41,13 +42,29 @@ class UserController
             redirect('auth', 'index');
         }
 
-        $name = trim($_POST['full_name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $phone = trim($_POST['phone'] ?? '');
-        $address = trim($_POST['address'] ?? '');
+        $name    = Security::stripEmoji(trim($_POST['full_name'] ?? ''));
+        $email   = trim($_POST['email'] ?? '');
+        $phone   = trim($_POST['phone'] ?? '');
+
+        // Normalize and validate PH phone number
+        $normalizedPhone = '';
+        if ($phone !== '') {
+            $normalized = Security::validatePHPhone($phone);
+            if ($normalized === false) {
+                Flash::set('error', 'Invalid contact number. Please enter a valid Philippine mobile number (e.g. 09171234567 or +639171234567).');
+                redirect('dashboard', 'settings');
+            }
+            $normalizedPhone = $normalized;
+        }
+        $address = Security::stripEmoji(trim($_POST['address'] ?? ''));
 
         if (empty($name) || empty($email)) {
             Flash::set('error', 'Name and email are required.');
+            redirect('dashboard', 'settings');
+        }
+
+        if (!Security::validateName($name)) {
+            Flash::set('error', 'Name contains invalid characters. Only letters, spaces, hyphens, and apostrophes are allowed.');
             redirect('dashboard', 'settings');
         }
 
@@ -56,7 +73,12 @@ class UserController
             redirect('dashboard', 'settings');
         }
 
-        if ($this->user->updateProfile($userId, $name, $email, $phone, $address)) {
+        if ($address !== '' && mb_strlen($address) > 500) {
+            Flash::set('error', 'Address is too long.');
+            redirect('dashboard', 'settings');
+        }
+
+        if ($this->user->updateProfile($userId, $name, $email, $normalizedPhone, $address)) {
             // Update session data
             $_SESSION['user']['name'] = $name;
             $_SESSION['user']['email'] = $email;
@@ -124,84 +146,10 @@ class UserController
         redirect('dashboard', 'settings');
     }
 
-    public function create()
+    public function delete(int|string $id)
     {
         AuthMiddleware::adminOnly();
-        require __DIR__ . '/../views/admin/users/create.php';
-    }
-
-    public function store()
-    {
-        AuthMiddleware::adminOnly();
-        $full_name = trim((string) filter_input(INPUT_POST, 'full_name', FILTER_SANITIZE_SPECIAL_CHARS));
-        $contact_number = trim((string) filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_SPECIAL_CHARS));
-        $email = trim((string) filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
-        $password = trim((string) $_POST['password'] ?? '');
-        $address = trim((string) filter_input(INPUT_POST, 'address', FILTER_SANITIZE_SPECIAL_CHARS));
-        $is_admin = filter_input(INPUT_POST, 'is_admin', FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-
-        $errors = [];
-
-        if ($full_name === '') {
-            $errors[] = 'Full name is required.';
-        }
-
-        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Valid email is required.';
-        }
-
-        if ($password === '' || strlen($password) < 6) {
-            $errors[] = 'Password must be at least 6 characters.';
-        }
-
-        if (!empty($errors)) {
-            http_response_code(422);
-            foreach ($errors as $error) {
-                echo "<p style='color:red;'>{$error}</p>";
-            }
-            return;
-        }
-
-        // Hash password
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-        $this->user->create($full_name, $contact_number, $email, $hashedPassword, $is_admin, $address);
-
-        header("Location: ?controller=user&action=index");
-        exit;
-    }
-
-    public function edit(int $id)
-    {
-        AuthMiddleware::adminOnly();
-        $user = $this->user->find($id);
-        require __DIR__ . '/../views/admin/users/edit.php';
-    }
-
-    public function update(int $id)
-    {
-        AuthMiddleware::adminOnly();
-        $full_name = trim((string) filter_input(INPUT_POST, 'full_name', FILTER_SANITIZE_SPECIAL_CHARS));
-        $contact_number = trim((string) filter_input(INPUT_POST, 'contact_number', FILTER_SANITIZE_SPECIAL_CHARS));
-        $email = trim((string) filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL));
-        $address = trim((string) filter_input(INPUT_POST, 'address', FILTER_SANITIZE_SPECIAL_CHARS));
-        $is_admin = filter_input(INPUT_POST, 'is_admin', FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
-
-        if ($full_name === '' || $email === '') {
-            echo "Invalid input.";
-            return;
-        }
-
-        $this->user->update($id, $full_name, $contact_number, $email, $is_admin, $address);
-
-        header("Location: ?controller=user&action=index");
-        exit;
-    }
-
-    public function delete(int $id)
-    {
-        AuthMiddleware::adminOnly();
-        $this->user->delete($id);
+        $this->user->delete((int)$id);
         header("Location: ?controller=user&action=index");
         exit;
     }

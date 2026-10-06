@@ -16,6 +16,9 @@ class CartController
 
     public function index(): void
     {
+        // Clear any lingering buy_now session when visiting the regular cart
+        unset($_SESSION['buy_now']);
+
         $user = $_SESSION['user'] ?? null;
         $cart = [];
         
@@ -224,7 +227,8 @@ class CartController
 
     private function jsonResponse(array $data): void
     {
-        header('Content-Type: application/json');
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
         echo json_encode($data);
         exit;
     }
@@ -290,8 +294,67 @@ class CartController
 
     public function checkout(): void
     {
-        $cart = $_SESSION['cart'] ?? [];
+        // If buy_now session exists, use only that item
+        if (!empty($_SESSION['buy_now'])) {
+            $cart = $_SESSION['buy_now'];
+            $is_buy_now = true;
+        } else {
+            $cart = $_SESSION['cart'] ?? [];
+            $is_buy_now = false;
+        }
         require __DIR__ . '/../views/cart/checkout.php';
+    }
+
+    /**
+     * Buy Now — stores a single item in buy_now session and redirects to checkout.
+     * Called via AJAX from the shop page.
+     */
+    public function buyNowDirect(): void
+    {
+        // Clean any buffered output and set JSON headers
+        while (ob_get_level()) ob_end_clean();
+        header('Content-Type: application/json; charset=utf-8');
+
+        $materialId = (int)($_GET['id'] ?? 0);
+        $quantity   = max(1, (int)($_GET['quantity'] ?? 1));
+
+        if ($materialId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid item.']);
+            exit;
+        }
+
+        $user = $_SESSION['user'] ?? null;
+        if (!$user) {
+            echo json_encode(['success' => false, 'message' => 'Not logged in.']);
+            exit;
+        }
+
+        $materialModel = new Material();
+        $material = $materialModel->find($materialId);
+
+        if (!$material || !($material['is_active'] ?? true)) {
+            echo json_encode(['success' => false, 'message' => 'Item not available.']);
+            exit;
+        }
+
+        $stock = (int)($material['stock_quantity'] ?? 0);
+        if ($quantity > $stock) {
+            echo json_encode(['success' => false, 'message' => "Only {$stock} units available."]);
+            exit;
+        }
+
+        // Store only this item in buy_now session
+        $_SESSION['buy_now'] = [[
+            'id'          => $materialId,
+            'material_id' => $materialId,
+            'name'        => $material['material_name'],
+            'price'       => (float)$material['unit_price'],
+            'unit'        => $material['unit_type'],
+            'qty'         => $quantity,
+        ]];
+
+        echo json_encode(['success' => true]);
+        exit;
     }
 
     public function placeOrder(): void
@@ -306,7 +369,7 @@ class CartController
             redirect('cart', 'index');
         }
 
-        if (empty($_SESSION['cart'])) {
+        if (empty($_SESSION['cart']) && empty($_SESSION['buy_now'])) {
             redirect('cart', 'index');
         }
 
@@ -317,11 +380,19 @@ class CartController
 
         $materialModel = new Material();
 
+        // Use buy_now session if present, otherwise use cart
+        $isBuyNow   = !empty($_SESSION['buy_now']);
+        $cartSource = $isBuyNow ? $_SESSION['buy_now'] : ($_SESSION['cart'] ?? []);
+
+        if (empty($cartSource)) {
+            redirect('cart', 'index');
+        }
+
         // ── SECURITY: Re-fetch all prices and names from DB — never trust client-side values ──
         $verifiedItems = [];
         $stockErrors   = [];
 
-        foreach ($_SESSION['cart'] as $item) {
+        foreach ($cartSource as $item) {
             $materialId = (int)($item['id'] ?? $item['material_id'] ?? 0);
             $requestedQty = (int)($item['qty'] ?? $item['quantity'] ?? 1);
 
@@ -391,9 +462,15 @@ class CartController
             $materialModel->log('Order Placed', "Order #{$orderId} - Total: ₱{$total}",
                 (int)($user['id'] ?? 0), $user['name'] ?? 'Unknown');
 
-            $_SESSION['cart'] = [];
-            if ($user && !empty($user['id'])) {
-                $materialModel->clearUserCart((int)$user['id']);
+            // Only clear the regular cart if this was NOT a buy_now order
+            if (!$isBuyNow) {
+                $_SESSION['cart'] = [];
+                if ($user && !empty($user['id'])) {
+                    $materialModel->clearUserCart((int)$user['id']);
+                }
+            } else {
+                // Clear only the buy_now session
+                unset($_SESSION['buy_now']);
             }
 
             Flash::set('success', 'Order placed successfully!');
@@ -512,6 +589,64 @@ class CartController
 
         Flash::set('success', 'Quantity updated.');
         redirect('cart', 'index');
+    }
+
+    public function updateQtyBulk(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('cart', 'checkout');
+        }
+
+        if (!Csrf::validate($_POST['_csrf'] ?? '')) {
+            Flash::set('error', 'Invalid request. Please try again.');
+            redirect('cart', 'checkout');
+        }
+
+        $ids  = $_POST['ids']  ?? [];
+        $qtys = $_POST['qtys'] ?? [];
+        $user = $_SESSION['user'] ?? null;
+
+        if (empty($ids) || count($ids) !== count($qtys)) {
+            redirect('cart', 'checkout');
+        }
+
+        $materialModel = new Material();
+
+        foreach ($ids as $i => $rawId) {
+            $materialId = (int)$rawId;
+            $qty        = max(1, (int)($qtys[$i] ?? 1));
+
+            if ($materialId <= 0 || $qty > 9999) continue;
+
+            // Validate stock
+            $material = $materialModel->find($materialId);
+            if (!$material || !($material['is_active'] ?? true)) continue;
+
+            $stock = (int)($material['stock_quantity'] ?? 0);
+            if ($qty > $stock) {
+                Flash::set('error', "{$material['material_name']}: Only {$stock} units available.");
+                redirect('cart', 'checkout');
+            }
+
+            if ($user && !empty($user['id'])) {
+                $materialModel->updateCartQuantity((int)$user['id'], $materialId, $qty);
+            } else {
+                foreach ($_SESSION['cart'] as &$item) {
+                    if ((int)($item['id'] ?? $item['material_id'] ?? 0) === $materialId) {
+                        $item['qty'] = $qty;
+                        break;
+                    }
+                }
+                unset($item);
+            }
+        }
+
+        if ($user && !empty($user['id'])) {
+            $this->syncCartToSession((int)$user['id'], $materialModel);
+        }
+
+        Flash::set('success', 'Cart updated.');
+        redirect('cart', 'checkout');
     }
 
     public function getStock(): void

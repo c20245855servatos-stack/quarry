@@ -47,32 +47,26 @@ define('DAILY_DELIVERY_LIMIT', 5);
   <!-- LEGEND -->
   <div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:24px; padding:16px; background:rgba(255,255,255,0.05); border-radius:12px; border:1px solid rgba(255,215,0,0.2);">
     <span style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-primary);font-weight:700;">
-      <span style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg, #fbbf24, #f59e0b);border:1px solid #f59e0b;display:inline-block;box-shadow:0 2px 4px rgba(251,191,36,0.3);"></span> Pending
-    </span>
-    <span style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-primary);font-weight:700;">
       <span style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg, #3b82f6, #2563eb);border:1px solid #2563eb;display:inline-block;box-shadow:0 2px 4px rgba(59,130,246,0.3);"></span> Active
     </span>
     <span style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-primary);font-weight:700;">
       <span style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg, #22c55e, #16a34a);border:1px solid #16a34a;display:inline-block;box-shadow:0 2px 4px rgba(34,197,94,0.3);"></span> Completed
-    </span>
-    <span style="display:flex;align-items:center;gap:8px;font-size:0.9rem;color:var(--text-primary);font-weight:700;">
-      <span style="width:16px;height:16px;border-radius:4px;background:linear-gradient(135deg, #ef4444, #dc2626);border:1px solid #dc2626;display:inline-block;box-shadow:0 2px 4px rgba(239,68,68,0.3);"></span> Cancelled
     </span>
   </div>
 
   <!-- CALENDAR CARD -->
   <div class="adm-card">
     <!-- NAV -->
-    <div class="adm-card-head" style="background:linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,176,0,0.05)); border-bottom:2px solid rgba(255,215,0,0.2);">
+    <div class="adm-card-head" style="background:linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,176,0,0.05)); border-bottom:2px solid rgba(255,215,0,0.2); flex-wrap:nowrap; align-items:center;">
       <a href="?controller=admin&action=calendar&month=<?= $prevMonth ?>&year=<?= $prevYear ?>"
-         class="adm-btn adm-btn-gray" style="padding:8px 16px; background:rgba(255,215,0,0.2); border:1px solid #FFD700; color:#FFD700; font-weight:700;">
+         class="adm-btn adm-btn-gray" style="padding:8px 12px; background:rgba(255,215,0,0.2); border:1px solid #FFD700; color:#FFD700; font-weight:700; flex-shrink:0;">
         <i class="bi bi-chevron-left"></i>
       </a>
-      <h3 style="margin:0; font-size:1.3rem; font-weight:900; color:#FFD700; text-shadow:0 2px 4px rgba(0,0,0,0.3); letter-spacing:0.5px;">
+      <h3 style="margin:0; font-size:clamp(1rem,4vw,1.3rem); font-weight:900; color:#FFD700; text-shadow:0 2px 4px rgba(0,0,0,0.3); letter-spacing:0.5px; text-align:center; flex:1;">
         <?= date('F Y', mktime(0,0,0,$month,1,$year)) ?>
       </h3>
       <a href="?controller=admin&action=calendar&month=<?= $nextMonth ?>&year=<?= $nextYear ?>"
-         class="adm-btn adm-btn-gray" style="padding:8px 16px; background:rgba(255,215,0,0.2); border:1px solid #FFD700; color:#FFD700; font-weight:700;">
+         class="adm-btn adm-btn-gray" style="padding:8px 12px; background:rgba(255,215,0,0.2); border:1px solid #FFD700; color:#FFD700; font-weight:700; flex-shrink:0;">
         <i class="bi bi-chevron-right"></i>
       </a>
     </div>
